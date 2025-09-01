@@ -1,0 +1,23 @@
+{
+    "raidBosses": [
+        "Hisuian Qwilfish",
+        "Chimecho",
+        "Elgyem",
+        "Morelull",
+        "Espeon",
+        "Umbreon",
+        "Bruxish",
+        "Necrozma",
+        "Mega Salamence"
+    ],
+    "shadowRaidBosses": [
+        "Bellsprout",
+        "Aipom",
+        "Teddiursa",
+        "Seedot",
+        "Girafarig",
+        "Absol",
+        "Whirlipede",
+        "Regirock"
+    ]
+}
