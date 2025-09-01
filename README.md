@@ -1,0 +1,2 @@
+# pokemongoraid_bot
+
