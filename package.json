@@ -9,12 +9,19 @@
     "start-bot": "node bot.js",
     "dev": "nodemon bot.js"
   },
-  "keywords": ["telegram", "bot", "pokemon", "raid"],
+  "keywords": [
+    "telegram",
+    "bot",
+    "pokemon",
+    "raid"
+  ],
   "author": "Alessandro Mamolo",
   "license": "MIT",
   "dependencies": {
+    "csv-parse": "^6.1.0",
     "dotenv": "^17.2.1",
     "grammy": "^1.38.1",
+    "node-fetch": "^3.3.2",
     "scrapedduck": "github:bigfoott/ScrapedDuck"
   },
   "devDependencies": {
