@@ -1,0 +1,24 @@
+{
+  "name": "pogoraidbot",
+  "version": "1.0.0",
+  "description": "Bot Telegram per organizzare raid di Pokemon GO",
+  "main": "bot.js",
+  "type": "module",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
+  },
+  "keywords": ["telegram", "bot", "pokemon", "raid"],
+  "author": "Alessandro Mamolo",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "grammy": "^1.38.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": "^12.20.0 || >=14.13.1"
+  }
+}
