@@ -1,6 +1,8 @@
 // Importa le librerie necessarie
-import { Bot, InlineKeyboard } from "grammy";
 import dotenv from 'dotenv';
+import { Bot, InlineKeyboard } from "grammy";
+import bosses from './ScrapedDuck/boss-names.json' assert { type: 'json' };
+import ScrapedDuck from 'ScrapedDuck';
 dotenv.config();
 
 const bot = new Bot(process.env.BOT_TOKEN);

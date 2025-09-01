@@ -5,7 +5,8 @@
   "main": "bot.js",
   "type": "module",
   "scripts": {
-    "start": "node bot.js",
+    "start-sd": "node ScrapedDuck/ScrapedDuck-mio.js",
+    "start-bot": "node bot.js",
     "dev": "nodemon bot.js"
   },
   "keywords": ["telegram", "bot", "pokemon", "raid"],
