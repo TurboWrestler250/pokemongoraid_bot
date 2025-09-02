@@ -1,9 +1,12 @@
-import { InlineKeyboard } from "grammy";
-import { raids } from "../utils/raids.js";
-import { findGymByKeywords } from "../utils/gyms.js";
+// import { InlineKeyboard } from "grammy";
+// import { raids } from "../utils/raids.js";
 import { formatRaid } from "../utils/formatRaid.js";
+import { findGymByKeywords } from "../utils/gyms.js";
+import { raidKeyboard } from "../utils/keyboards.js";
 
-export default function raidCommand(bot) {
+import { raids, raidMessageMap } from '../bot.js';
+
+export function raidCommand(bot) {
   bot.command("raid", async (ctx) => {
     const args = ctx.match?.split(" ") || [];
 
@@ -19,42 +22,35 @@ export default function raidCommand(bot) {
     const palestraWords = args.slice(1, startIndex);
     const palestraInfo = findGymByKeywords(palestraWords);
     const palestra = palestraInfo.nome;
-	const coordinates = palestraInfo.coords;
-	const start = args[2] ? args[2] : "";
+    const coordinates = palestraInfo.coords;
+    const start = args[2] ? args[2] : "";
     const end = args[3]?.match(/^\d{1,2}:\d{2}$/) ? args[3] : "";
-	const notes = args[4] ? args.slice(4).join(" ") : args.slice(3).join(" ");
+	  const notes = args[4] ? args.slice(4).join(" ") : args.slice(3).join(" ");
 
 
     if (!palestraInfo) return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");
 
     const raidId = Math.floor(Math.random() * 1000000).toString();
-	const raid = {
-		id: raidId,
-		pokemon,
-		palestra,
-		coordinates,
-		start,
-		end,
-		notes,
-		creator: ctx.from?.first_name || "Sconosciuto",
-		players: [],
-    };
+    const raid = {
+      id: raidId,
+      pokemon,
+      palestra,
+      coordinates,
+      start,
+      end,
+      notes,
+      creator: ctx.from?.first_name || "Sconosciuto",
+      players: [],
+      };
 
     raids.set(raidId, raid);
 
-    const keyboard = new InlineKeyboard()
-      .text("🚶", `join:${raidId}:🚶`)
-      .text("✈️", `join:${raidId}:✈️`)
-      .text("📡", `join:${raidId}:📡`)
-      .text("✉️", `join:${raidId}:✉️`)
-      .text("❌", `leave:${raidId}:❌`)
-      .row()
-      .text("⚙️", `join:${raidId}:⚙️`)
-      .text("🔄", `join:${raidId}:🔄`);
-
-    await ctx.reply(formatRaid(raid), {
-      reply_markup: keyboard,
-      parse_mode: "Markdown",
-    });
+    const sendMessage = await ctx.reply(formatRaid(raid), { 
+        reply_markup: raidKeyboard(raidId),
+        parse_mode: "Markdown"
+      });
+    
+      raidMessageMap.set(raidId, sendMessage.message_id);
+      console.log(`Associato Raid ${raidId} al messaggio ${sendMessage.message_id}`);
   });
 }

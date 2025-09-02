@@ -2,12 +2,15 @@
 import dotenv from 'dotenv';
 import fs from "fs";
 
-import fetch from "node-fetch";
-import { parse } from "csv-parse/sync";
+import { Bot } from "grammy";
+// import { Message } from "grammy/types";
 // import bosses from './ScrapedDuck/boss-names.json' assert { type: 'json' };
 // import ScrapedDuck from 'ScrapedDuck';
 
-import { formatRaid } from "./utils/formatRaid.js";
+import { raidCommand } from "./commands/raid.js";
+
+import { callback } from "./utils/callback.js";
+import { readGoogleSheet } from "./utils/gyms.js";
 import { raidKeyboard } from "./utils/keyboards.js";
 
 dotenv.config();
@@ -16,98 +19,16 @@ dotenv.config();
 const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
 const bosses = JSON.parse(rawData);
 
-// console.log("Raid Bosses:", bosses.raidBosses);
-// console.log("Shadow Raid Bosses:", bosses.shadowRaidBosses);
-
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTIKmAkbVox16DFHqUK-wvsOP8-yoqs5LpKxBbz0RV-KaUpTD_99kDsfqSEB2j2xm4qGqsYopYlvVBi/pub?output=csv';
-
-let gyms = []; // variabile globale che contiene i dati del foglio
-
-export async function readGoogleSheet() {
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-
-    gyms = parse(text, {
-        columns: true, // prima riga per intestazioni
-        skip_empty_lines: true
-    });
-}
-
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-// Funzione per trovare la palestra a partire dalle parole chiave
-function findGymByKeywords(keywords) {
-    keywords = keywords.map(k => k.toLowerCase());
-
-    for (const gym of gyms) {
-        if (!gym['Parole chiave']) continue;
-
-        const gymKeywords = gym['Parole chiave'].toLowerCase().split(" "); // dividi per parole
-        const matched = keywords.some(k => gymKeywords.includes(k));
-        if (matched) {
-            const coords = [
-                parseFloat(gym['Latitudine']),
-                parseFloat(gym['Longitudine'])
-            ];
-            return { nome: gym['Nome palestra'], coords };
-        }
-    }
-
-    return null; // nessuna corrispondenza
-}
-
 const bot = new Bot(process.env.BOT_TOKEN);
-
-// Struttura dei raid memorizzati in memoria
-const raids = new Map();
+export const raids = new Map();			// Struttura dei raid memorizzati in memoria
+export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
 
 // COMANDI del bot
-bot.command("raid", async (ctx) => {
-	const args = ctx.match?.split(" ") || [];
-
-	if (args.length < 3) {
-		return ctx.reply("Uso: /raid [pokemon] [palestra] [ora inizio] [ora fine?] [note?]");
-	}
-
-	const pokemon = args[0] ? args[0] : "";
-	 // Trova il primo valore con pattern "00:00" (orario)
-    const timePattern = /^\d{1,2}:\d{2}$/;
-    let startIndex = args.findIndex(a => timePattern.test(a));
-    if (startIndex === -1) return ctx.reply("Orario di inizio non trovato.");
-
-    const palestraWords = args.slice(1, startIndex); // parole relative alla palestra
-	const palestraInfo = findGymByKeywords(palestraWords);
-	const palestra = palestraInfo.nome;
-	const coordinates = palestraInfo.coords;
-	const start = args[2] ? args[2] : "";
-	const end = args[3] && args[3].match(/^\d{1,2}:\d{2}$/) ? args[3] : "";
-	const notes = args[4] ? args.slice(4).join(" ") : args.slice(3).join(" ");
-
-	if (!palestra) {
-        return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");
-    }
-
-	const raidId = Math.floor(Math.random() * 1000000).toString();
-	const raid = {
-		id: raidId,
-		pokemon,
-		palestra,
-		coordinates,
-		start,
-		end,
-		notes,
-		creator: ctx.from?.first_name || "Sconosciuto",
-		players: [],
-	};
-
-	raids.set(raidId, raid);
-
-	await ctx.reply(formatRaid(raid), { 
-		reply_markup: raidKeyboard(raidId),
-		parse_mode: "Markdown"
-	});
-});
+raidCommand(bot);
+callback(bot);
 
 bot.command("id", async (ctx) => {
 	if (ctx.msg?.reply_to_message) {
@@ -176,7 +97,7 @@ bot.command("note", async (ctx) => {
         return ctx.reply("❌ Devi rispondere a un messaggio raid per aggiornare le note.", {
             reply_to_message_id: ctx.message?.message_id
         });
-    }
+    } else console.log(ctx.message.reply_to_message + "\n-- fine messaggio --\n")
 
     const newNote = ctx.match?.trim();
     if (!newNote) {
@@ -187,7 +108,8 @@ bot.command("note", async (ctx) => {
 
     // Trova il raid corrispondente al messaggio reply
     const repliedMsgId = ctx.message.reply_to_message.message_id;
-    const raidEntry = Array.from(raids.values()).find(r => r.message_id === repliedMsgId);
+    const raidEntry = Array.from(raids.values()).find(r => raidMessageMap.get(r.id) === repliedMsgId);
+	console.log(raidEntry);
 
     if (!raidEntry) {
         return ctx.reply("❌ Questo messaggio non è un raid valido.", {
@@ -195,11 +117,20 @@ bot.command("note", async (ctx) => {
         });
     }
 
+	// Recupera il raidId corrispondente al messaggio
+	const raidId = Array.from(raidMessageMap.entries()).find(([key, value]) => value === repliedMsgId)?.[0];
+
+	if (!raidId) {
+		return ctx.reply("❌ Non ho trovato l'ID del raid associato.", {
+			reply_to_message_id: ctx.message?.message_id
+		});
+	}
+
     // Aggiorna le note
     raidEntry.notes = newNote;
 
     // Aggiorna il messaggio originale
-    await ctx.editMessageText(formatRaid(raidEntry), {
+    await ctx.editMessageText(escapeMarkdownV2(raidEntry.notes), {
         reply_markup: raidKeyboard(raidId),
         parse_mode: "MarkdownV2"
     });
@@ -235,66 +166,28 @@ bot.command("raidsinfo", async (ctx) => {
 });
 
 
-// Gestione pulsanti
-bot.on("callback_query:data", async (ctx) => {
-	const [action, raidId, icon] = ctx.callbackQuery.data.split(":");
-	if (!raidId) return ctx.answerCallbackQuery();
-	const raid = raids.get(raidId);
-	if (!raid) return ctx.answerCallbackQuery();
 
-	const userId = ctx.from.id;
-	const name = ctx.from.first_name;
-
-	if (action === "join") {
-		let player = raid.players.find((p) => p.userId === userId);
-		if (!player) {
-			player = { userId, name, icon: icon, count: 1 };
-			raid.players.push(player);
-		} else {
-			if (player.icon === icon) {
-			player.count++;
-			} else {
-			player.icon = icon;
-			player.count++;
-			}
-		}
-	} else if (action === "leave") {
-		let player = raid.players.find((p) => p.userId === userId);
-		if (player && player.count > 1) {
-			player.count--;
-		} else {
-			raid.players = raid.players.filter((p) => p.userId !== userId);
-		}
-	}
-
-	// Aggiorna il messaggio
-	await ctx.editMessageText(formatRaid(raid), {
-		reply_markup: raidKeyboard(raidId),
-		parse_mode: "Markdown"
-	});
-
-	await ctx.answerCallbackQuery();
-});
-
-// Dizionario per associare raid ID -> Telegram message ID
-const raidMessageMap = new Map();
 
 // Middleware per intercettare tutti i messaggi
-bot.on("message", (ctx) => {
-    const text = ctx.message?.text;
-    if (!text) return; // solo messaggi di testo
+// bot.on("message", (ctx) => {
+//     const text = ctx.message?.text;
+//     if (!text) return; // solo messaggi di testo
 
-    // Cerca pattern "ID Raid: <numero>"
-    const match = text.match(/ID Raid: (\d+)/);
-    if (match) {
-        const raidId = match[1];
-        const messageId = ctx.message.message_id;
+//     // Cerca pattern "ID Raid: <numero>"
+//     const match = text.match(/ID Raid: (\d+)/);
+//     if (match) {
+//         const raidId = match[1];
+//         const messageId = ctx.message.message_id;
 
-        // Salva l'associazione
-        raidMessageMap.set(raidId, messageId);
-        console.log(`Associato Raid ${raidId} al messaggio ${messageId}`);
-    }
-});
+//         // Salva l'associazione
+//         raidMessageMap.set(raidId, messageId);
+//         console.log(`Associato Raid ${raidId} al messaggio ${messageId}`);
+//     }
+// });
+
+function escapeMarkdownV2(text/*: string*/)/*: string*/ {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s!]/g, '\\$&');
+}
 
 bot.start({ drop_pending_updates: true });
 console.log("Bot avviato!");

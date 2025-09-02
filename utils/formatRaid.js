@@ -17,7 +17,8 @@ Scadenza : ${raid.end || "?"}
 ${totalPlayers} giocatori confermati:
 ${players || "Nessuno ancora"}
 ───────
-${raid.notes ? raid.notes + "\n───────\n" : ""}
+${raid.notes ? raid.notes : ""}
+───────
 Creatore: ${raid.creator}
 ID Raid: ${raid.id}`;
 }
