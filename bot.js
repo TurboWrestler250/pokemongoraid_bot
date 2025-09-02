@@ -2,11 +2,14 @@
 import dotenv from 'dotenv';
 import fs from "fs";
 
-import { Bot, InlineKeyboard } from "grammy";
 import fetch from "node-fetch";
 import { parse } from "csv-parse/sync";
 // import bosses from './ScrapedDuck/boss-names.json' assert { type: 'json' };
 // import ScrapedDuck from 'ScrapedDuck';
+
+import { formatRaid } from "./utils/formatRaid.js";
+import { raidKeyboard } from "./utils/keyboards.js";
+
 dotenv.config();
 
 // Leggi il JSON
@@ -100,18 +103,8 @@ bot.command("raid", async (ctx) => {
 
 	raids.set(raidId, raid);
 
-	const keyboard = new InlineKeyboard()
-	.text("🚶", `join:${raidId}:🚶`)
-	.text("✈️", `join:${raidId}:✈️`)
-	.text("📡", `join:${raidId}:📡`)
-	.text("✉️", `join:${raidId}:✉️`)
-	.text("❌", `leave:${raidId}:❌`)
-	.row()
-	.text("⚙️", `join:${raidId}:⚙️`)
-	.text("🔄", `join:${raidId}:🔄`);
-
 	await ctx.reply(formatRaid(raid), { 
-		reply_markup: keyboard,
+		reply_markup: raidKeyboard(raidId),
 		parse_mode: "Markdown"
 	});
 });
@@ -206,18 +199,8 @@ bot.command("note", async (ctx) => {
     raidEntry.notes = newNote;
 
     // Aggiorna il messaggio originale
-    const keyboard = new InlineKeyboard()
-        .text("🚶", `join:${raidEntry.id}:🚶`)
-        .text("✈️", `join:${raidEntry.id}:✈️`)
-        .text("📡", `join:${raidEntry.id}:📡`)
-        .text("✉️", `join:${raidEntry.id}:✉️`)
-        .text("❌", `leave:${raidEntry.id}:❌`)
-        .row()
-        .text("⚙️", `join:${raidEntry.id}:⚙️`)
-        .text("🔄", `join:${raidEntry.id}:🔄`);
-
     await ctx.editMessageText(formatRaid(raidEntry), {
-        reply_markup: keyboard,
+        reply_markup: raidKeyboard(raidId),
         parse_mode: "MarkdownV2"
     });
 
@@ -286,46 +269,12 @@ bot.on("callback_query:data", async (ctx) => {
 
 	// Aggiorna il messaggio
 	await ctx.editMessageText(formatRaid(raid), {
-	reply_markup: new InlineKeyboard()
-		.text("🚶", `join:${raidId}:🚶`)
-		.text("✈️", `join:${raidId}:✈️`)
-		.text("📡", `join:${raidId}:📡`)
-		.text("✉️", `join:${raidId}:✉️`)
-		.text("❌", `leave:${raidId}:❌`)
-		.row()
-		.text("⚙️", `join:${raidId}:⚙️`)
-		.text("🔄", `join:${raidId}:🔄`),
-	parse_mode: "Markdown"
+		reply_markup: raidKeyboard(raidId),
+		parse_mode: "Markdown"
 	});
 
 	await ctx.answerCallbackQuery();
 });
-
-// Funzione che formatta il messaggio
-function formatRaid(raid) {
-	const link = `https://www.pogoitalianleague.com/raid-boss-${raid.pokemon.toLowerCase()}/`;
-	const players = raid.players
-		.map((p, i) => `${i + 1}. ${p.icon} ${p.name}${p.count > 1 ? " +" + (p.count - 1) : ""}`)
-		.join("\n");
-	// Calcola il totale dei giocatori sommando tutti i coun
-	const totalPlayers = raid.players.reduce((total, player) => total + player.count, 0);
-
-	return `🔰 [${raid.pokemon.toUpperCase()}](${link}) 🔰
-	───────
-	Palestra : ${raid.palestra}
-	Coord.	 : \`${raid.coordinates[0].toFixed(6)}, ${raid.coordinates[1].toFixed(6)}\`
-	Location : ${process.env.LOCATION || "Gorizia"}
-	Ritrovo  : ${raid.start}
-	Scadenza : ${raid.end || "?"}
-	───────
-	${totalPlayers} giocatori confermati:
-	${players || "Nessuno ancora"}
-	───────
-	${raid.notes ? raid.notes + "\n───────\n" : ""}
-	Creatore: ${raid.creator}
-	ID Raid: ${raid.id}`;
-}
-// Coord.	 : [${raid.coordinates[0].toFixed(5)}, ${raid.coordinates[1].toFixed(5)}](https://www.google.com/maps/search/?api=1&query=${raid.coordinates[0]},${raid.coordinates[1]})
 
 // Dizionario per associare raid ID -> Telegram message ID
 const raidMessageMap = new Map();
@@ -348,5 +297,4 @@ bot.on("message", (ctx) => {
 });
 
 bot.start({ drop_pending_updates: true });
-
 console.log("Bot avviato!");
