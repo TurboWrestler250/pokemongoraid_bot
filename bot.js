@@ -14,6 +14,7 @@ import { infoCommand } from "./commands/info.js";
 
 import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
+import { listenerCommands } from "./utils/listenerCommands.js";
 
 dotenv.config();
 
@@ -27,8 +28,10 @@ await readGoogleSheet();
 const bot = new Bot(process.env.BOT_TOKEN);
 export const raids = new Map();				// Struttura dei raid memorizzati in memoria
 export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
+export const commands = ["raid", "raids", "info"];
 
 // COMANDI del bot
+await listenerCommands(bot);
 raidCommand(bot);
 raidsCommand(bot);
 noteCommand(bot);
