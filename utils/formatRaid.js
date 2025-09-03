@@ -1,6 +1,9 @@
+import { dataPokemon } from '../utils/dataPokemon.js';
 
-export function formatRaid(raid) {
-  const link = `https://www.pogoitalianleague.com/raid-boss-${raid.pokemon.toLowerCase()}/`;
+export async function formatRaid(raid) {
+  const pokemon = await dataPokemon(raid.pokemon.toLowerCase());
+  // console.log(pokemon.id);
+  const link = `https://db.pokemongohub.net/pokemon/${pokemon.id}/`;
   const players = raid.players
     .map((p, i) => `${i + 1}. ${p.icon} ${p.name}${p.count > 1 ? " +" + (p.count - 1) : ""}`)
     .join("\n");
@@ -22,5 +25,19 @@ ${raid.notes ? raid.notes : ""}
 Creatore: ${raid.creator}
 ID Raid: ${raid.id}`;
 }
+
+// function getPokedexData(raid){
+//   const resp = fetch("https://ex.traction.one/pokedex/pokemon");
+//   const data = resp.json();
+//   return data; // nome ↔ numero
+// }
+
+// async function getPokemonNumber(name) {
+//   const data = await getPokedexData();
+//   const key = Object.keys(data).find(
+//     key => data[key].toLowerCase() === name.toLowerCase()
+//   );
+//   return key ? Number(key) : null;
+// }
 
 // Coord.	 : [${raid.coordinates[0].toFixed(5)}, ${raid.coordinates[1].toFixed(5)}](https://www.google.com/maps/search/?api=1&query=${raid.coordinates[0]},${raid.coordinates[1]})
