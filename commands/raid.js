@@ -89,20 +89,20 @@ function addRaid(bot, ctx, raid) {
   }, delay);
 
   // Ogni 30 secondi mostra quanto manca
-  raid.interval = setInterval(() => {
-    const now = new Date().getTime();
-    const remaining = delay - (now - raid.createdAt);
+  // raid.interval = setInterval(() => {
+  //   const now = new Date().getTime();
+  //   const remaining = delay - (now - raid.createdAt);
 
-    if (remaining <= 0) {
-      clearInterval(raid.interval);
-    } else {
-      const minutesLeft = Math.floor(remaining / 60000);
-      const secondsLeft = Math.floor((remaining % 60000) / 1000);
-      console.log(
-        `Raid ${raid.id}: rimangono ${minutesLeft}m ${secondsLeft}s`
-      );
-    }
-  }, 10 * 1000);
+  //   if (remaining <= 0) {
+  //     clearInterval(raid.interval);
+  //   } else {
+  //     const minutesLeft = Math.floor(remaining / 60000);
+  //     const secondsLeft = Math.floor((remaining % 60000) / 1000);
+  //     console.log(
+  //       `Raid ${raid.id}: rimangono ${minutesLeft}m ${secondsLeft}s`
+  //     );
+  //   }
+  // }, 10 * 1000);
 
   // Salviamo anche l'istante di creazione per i calcoli
   raid.createdAt = new Date().getTime();
