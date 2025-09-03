@@ -43,14 +43,104 @@ export function raidCommand(bot) {
       players: [],
       };
 
-    raids.set(raidId, raid);
+    addRaid(bot, ctx, raid);
 
-    const sendMessage = await ctx.reply(formatRaid(raid), { 
-        reply_markup: raidKeyboard(raidId),
-        parse_mode: "Markdown"
-      });
+    const sendMessage = await ctx.reply(await formatRaid(raid), { 
+      reply_markup: raidKeyboard(raidId),
+      parse_mode: "Markdown",
+      disable_web_page_preview: true
+    });
     
-      raidMessageMap.set(raidId, sendMessage.message_id);
-      console.log(`Associato Raid ${raidId} al messaggio ${sendMessage.message_id}`);
+    raidMessageMap.set(raidId, sendMessage.message_id);
+    console.log(`Associato Raid ${raidId} al messaggio ${sendMessage.message_id}`);
   });
+}
+
+function addRaid(bot, ctx, raid) {
+  raids.set(raid.id, raid);
+
+  // Calcolo timeout
+  const [hours, minutes] = raid.end.split(":").map(Number); // raid.end = "15:30"
+  let delay;
+
+  if (raid.end) {
+    const now = new Date();
+    const endTime = new Date(
+      now.getFullYear(),  // anno di oggi
+      now.getMonth(),     // mese di oggi (0-11)
+      now.getDate(),      // giorno di oggi
+      hours,              // ora che vuoi
+      minutes,            // minuti che vuoi
+      0,                  // secondi
+      0                   // millisecondi
+    );
+    delay = endTime.getTime() - now.getTime();
+  }
+
+  // Se non c'è end o end è passato, imposta 6 ore di default
+  if (!delay || delay <= 0) {
+    delay = 6 * 60 * 60 * 1000; // 6 ore in ms
+  }
+
+  // Imposta timeout per distruggere il raid
+  raid.timeout = setTimeout(async () => {
+    clearInterval(raid.interval); // fermiamo il log
+    await closeRaid(bot, ctx, raid);
+  }, delay);
+
+  // Ogni 30 secondi mostra quanto manca
+  raid.interval = setInterval(() => {
+    const now = new Date().getTime();
+    const remaining = delay - (now - raid.createdAt);
+
+    if (remaining <= 0) {
+      clearInterval(raid.interval);
+    } else {
+      const minutesLeft = Math.floor(remaining / 60000);
+      const secondsLeft = Math.floor((remaining % 60000) / 1000);
+      console.log(
+        `Raid ${raid.id}: rimangono ${minutesLeft}m ${secondsLeft}s`
+      );
+    }
+  }, 10 * 1000);
+
+  // Salviamo anche l'istante di creazione per i calcoli
+  raid.createdAt = new Date().getTime();
+}
+
+function updateRaidEnd(raidId, newEnd) {
+  const raid = raids.get(raidId);
+  if (!raid) return;
+
+  // Cancella timeout precedente
+  if (raid.timeout) clearTimeout(raid.timeout);
+
+  raid.end = newEnd;
+
+  // Imposta nuovo timeout
+  addRaid(raid);
+}
+
+async function closeRaid(bot, ctx, raid) {
+  const raidMsgId = raidMessageMap.get(raid.id);
+  if (!raidMsgId) return;
+
+  // Se c’è un timeout attivo, lo puliamo
+  // if (raid.timeout) {
+  //   clearTimeout(raid.timeout);
+  // }
+
+    // Rimuovi il messaggio Telegram se esiste
+  if (raidMsgId) {
+    try {
+      // await ctx.deleteMessage();
+      await bot.api.deleteMessage(ctx.chatId, raidMsgId);
+    } catch (err) {
+      console.log("Errore eliminando messaggio:", err.description || err);
+    }
+  }
+
+  raids.delete(raid.id);
+  console.log(`Raid ${raid.id} chiuso`);
+  // Qui puoi anche aggiornare il messaggio su Telegram
 }

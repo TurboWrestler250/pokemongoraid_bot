@@ -9,6 +9,6 @@ export function raidKeyboard(raidId) {
 		.text("✉️", `join:${raidId}:✉️`)
 		.text("❌", `leave:${raidId}:❌`)
 		.row()
-		.text("⚙️", `join:${raidId}:⚙️`)
-		.text("🔄", `join:${raidId}:🔄`);
+		// .text("⚙️", `join:${raidId}:⚙️`)
+		.text("🔄", `refresh:${raidId}:🔄`);
 }
