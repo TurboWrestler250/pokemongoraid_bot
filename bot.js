@@ -10,6 +10,7 @@ import { Bot } from "grammy";
 import { noteCommand } from "./commands/note.js";
 import { raidCommand } from "./commands/raid.js";
 import { raidsCommand } from "./commands/raids.js";
+import { tagCommand } from "./commands/tag.js";
 import { infoCommand } from "./commands/info.js";
 
 import { callback } from "./utils/callback.js";
@@ -28,12 +29,13 @@ await readGoogleSheet();
 const bot = new Bot(process.env.BOT_TOKEN);
 export const raids = new Map();				// Struttura dei raid memorizzati in memoria
 export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
-export const commands = ["raid", "raids", "info"];
+export const commands = ["raid", "raids", "info", "tag"];
 
 // COMANDI del bot
 await listenerCommands(bot);
 raidCommand(bot);
 raidsCommand(bot);
+tagCommand(bot);
 noteCommand(bot);
 callback(bot);
 infoCommand(bot);

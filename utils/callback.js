@@ -14,9 +14,10 @@ export function callback(bot) {
 
         const userId = ctx.from.id;
         const name = ctx.from.first_name;
+        const username = ctx.from.username;
 
         if (action === "join") {
-            handleJoin(raid, userId, name, icon);
+            handleJoin(raid, userId, name, username, icon);
         } else if (action === "leave") {
             const left = handleLeave(raid, userId);
             if (!left) {
@@ -62,10 +63,10 @@ export function callback(bot) {
     })
 };
 
-function handleJoin(raid, userId, name, icon) {
+function handleJoin(raid, userId, name, username, icon) {
     let player = raid.players.find((p) => p.userId === userId);
     if (!player) {
-        player = { userId, name, icon: icon, count: 1 };
+        player = { userId, name, username, icon: icon, count: 1 };
         raid.players.push(player);
     } else {
         if (player.icon === icon) {
