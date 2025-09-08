@@ -4,28 +4,35 @@ import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
+import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 import { raids, raidMessageMap } from '../bot.js';
 
 export function raidCommand(bot) {
   bot.command("raid", async (ctx) => {
+    fetchBosses();
+
     const args = ctx.match?.split(" ") || [];
 
     if (args.length < 3) {
+      //                            0         1           2           3           4
       return ctx.reply("Uso: /raid [pokemon] [palestra] [ora inizio] [ora fine?] [note?]");
     }
 
     const pokemon = args[0] || "";
-    const timePattern = /^\d{1,2}:\d{2}$/;
-    let startIndex = args.findIndex((a) => timePattern.test(a));
-    if (startIndex === -1) return ctx.reply("Orario di inizio non trovato.");
-
     const palestraWords = args.slice(1, startIndex);
     const palestraInfo = findGymByKeywords(palestraWords);
     const palestra = palestraInfo.nome;
     const coordinates = palestraInfo.coords;
-    const start = args[2] ? args[2] : "";
-    const end = args[3]?.match(/^\d{1,2}:\d{2}$/) ? args[3] : "";
-	  const notes = args[4] ? args.slice(4).join(" ") : args.slice(3).join(" ");
+    const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    const start = args[2] && timePattern.test(args[2]) ? args[2] : new Date().toTimeString().slice(0,5); // ora attuale HH:MM (primi 5 caratteri)
+    let end = "";
+    let notes = "";
+    if (args[3] && timePattern.test(args[3])) {
+      end = args[3];
+      notes = args.slice(4).join(" ");
+    } else {
+      notes = args.slice(3).join(" ");
+    }
 
 
     if (!palestraInfo) return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");

@@ -84,9 +84,3 @@ async function fetchBosses() {
         })
         .catch(err => console.error("Errore:", err));
 }
-
-// Avvio immediato
-fetchBosses();
-
-// Ripetizione ogni ora (3600000 ms)
-setInterval(fetchBosses, 60 * 60 * 1000);

@@ -1,0 +1,26 @@
+{
+    "raidBosses": [
+        "Tangela",
+        "Staryu",
+        "Omanyte",
+        "Kabuto",
+        "Pinsir",
+        "Lapras",
+        "Snorlax",
+        "Palkia",
+        "Mega Venusaur",
+        "Mega Charizard X",
+        "Mega Charizard Y",
+        "Mega Blastoise"
+    ],
+    "shadowRaidBosses": [
+        "Bellsprout",
+        "Aipom",
+        "Teddiursa",
+        "Seedot",
+        "Girafarig",
+        "Absol",
+        "Whirlipede",
+        "Regigigas"
+    ]
+}
