@@ -6,28 +6,47 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTIKmAkbVox16DF
 let gyms = [];
 
 export async function readGoogleSheet() {
-  const res = await fetch(CSV_URL);
-  const text = await res.text();
-
-  gyms = parse(text, {
-    columns: true,
-    skip_empty_lines: true,
-  });
+  try {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    gyms = parse(text, {
+      columns: true,
+      skip_empty_lines: true,
+    });
+  } catch (err) {
+    console.error("Errore leggendo il Google Sheet:", err);
+    console.log("gyms:", gyms);
+  }
 }
 
-export function findGymByKeywords(keywords) {
-  keywords = keywords.map((k) => k.toLowerCase());
-
-  for (const gym of gyms) {
-    if (!gym["Parole chiave"]) continue;
-
-    const gymKeywords = gym["Parole chiave"].toLowerCase().split(" ");
-    if (keywords.some((k) => gymKeywords.includes(k))) {
-      return {
-        nome: gym["Nome palestra"],
-        coords: [parseFloat(gym["Latitudine"]), parseFloat(gym["Longitudine"])],
-      };
+export function findGymByKeywords(keyword) {
+  try {
+    if (!keyword || typeof keyword !== "string") {
+      return null;
     }
+
+    const search = keyword.toLowerCase();
+
+    for (const gym of gyms) {
+      if (!gym["Parole chiave"]) continue;
+
+      const gymKeywords = gym["Parole chiave"].toLowerCase().split(" ");
+
+      if (gymKeywords.includes(search)) {
+        return {
+          nome: gym["Nome palestra"],
+          coords: [
+            parseFloat(gym["Latitudine"]),
+            parseFloat(gym["Longitudine"]),
+          ],
+        };
+      }
+    }
+
+    return null;
+  } catch (err) {
+    console.error("Errore in findGymByKeywords:", err);
+    console.log("gyms:", gyms);
+    return null;
   }
-  return null;
 }

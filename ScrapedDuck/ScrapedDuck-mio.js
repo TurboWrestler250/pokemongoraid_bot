@@ -19,7 +19,7 @@ function logToFile(message) {
     appendFileSync(LOG_PATH, `[${date} ${time}] ${message}\n`);
 }
 
-async function fetchBosses() {
+export async function fetchBosses() {
     JSDOM.fromURL("https://leekduck.com/boss/")
         .then(dom => {
             const document = dom.window.document;

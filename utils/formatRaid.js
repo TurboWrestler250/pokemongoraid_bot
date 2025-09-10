@@ -9,21 +9,39 @@ export async function formatRaid(raid) {
     .join("\n");
   const totalPlayers = raid.players.reduce((sum, p) => sum + p.count, 0);
 
-  return `🔰 [${raid.pokemon.toUpperCase()}](${link}) 🔰
-───────
-Palestra : ${raid.palestra}
-Coord.   : \`${raid.coordinates[0].toFixed(6)}, ${raid.coordinates[1].toFixed(6)}\`
-Location : ${process.env.LOCATION || "Gorizia"}
-Ritrovo  : ${raid.start}
-Scadenza : ${raid.end || "?"}
-───────
+//   return `
+// 🔰 [${raid.pokemon.toUpperCase()}](${link}) 🔰
+// \t\t───────
+// Palestra\t\t: ${raid.palestra}
+// Coord.\t\t: \`${raid.coordinates[0].toFixed(6)}, ${raid.coordinates[1].toFixed(6)}\`
+// Location\t\t: ${process.env.LOCATION || "Gorizia"}
+// Ritrovo\t\t: ${raid.start}
+// Scadenza\t\t: ${raid.end || "?"}
+// \t\t───────
+// ${totalPlayers} giocatori confermati:
+// ${players || "Nessuno ancora"}
+// \t\t───────
+// ${raid.notes ? raid.notes : ""}
+// \t\t───────
+// Creatore: ${raid.creator}
+// ID Raid: ${raid.id}`;
+
+  return `
+🔰 [${raid.pokemon.toUpperCase()}](${link}) 🔰
+\`      ───────\`
+\`Palestra : \`${raid.palestra}
+\`Coord.   : \`\`${raid.coordinates[0].toFixed(6)}, ${raid.coordinates[1].toFixed(6)}\`
+\`Location : \`_${"Gorizia"}_
+\`Ritrovo  : \`**${raid.start}**
+\`Scadenza : \`${raid.end || "?"}
+\`      ───────\`
 ${totalPlayers} giocatori confermati:
 ${players || "Nessuno ancora"}
-───────
-${raid.notes ? raid.notes : ""}
-───────
-Creatore: ${raid.creator}
-ID Raid: ${raid.id}`;
+\`      ───────\`
+_${raid.notes ? raid.notes : ""}_
+\`      ───────\`
+Creatore: \`${raid.creator}\`
+ID Raid: \`${raid.id}\``;
 }
 
 // function getPokedexData(raid){

@@ -1,17 +1,14 @@
 {
     "raidBosses": [
-        "Tangela",
-        "Staryu",
-        "Omanyte",
-        "Kabuto",
-        "Pinsir",
-        "Lapras",
-        "Snorlax",
+        "Pikachu",
+        "Magikarp",
+        "Shinx",
+        "Arcanine",
+        "Dragonite",
+        "Luxray",
         "Palkia",
-        "Mega Venusaur",
-        "Mega Charizard X",
-        "Mega Charizard Y",
-        "Mega Blastoise"
+        "Mega Pidgeot",
+        "Mega Gyarados"
     ],
     "shadowRaidBosses": [
         "Bellsprout",

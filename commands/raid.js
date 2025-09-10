@@ -19,8 +19,8 @@ export function raidCommand(bot) {
     }
 
     const pokemon = args[0] || "";
-    const palestraWords = args.slice(1, startIndex);
-    const palestraInfo = findGymByKeywords(palestraWords);
+    // const palestraWords = args[1];
+    const palestraInfo = findGymByKeywords(args[1]);
     const palestra = palestraInfo.nome;
     const coordinates = palestraInfo.coords;
     const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
