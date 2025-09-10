@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { parse } from "csv-parse";
+import { parse } from "csv-parse/sync";
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTIKmAkbVox16DFHqUK-wvsOP8-yoqs5LpKxBbz0RV-KaUpTD_99kDsfqSEB2j2xm4qGqsYopYlvVBi/pub?output=csv";
 
