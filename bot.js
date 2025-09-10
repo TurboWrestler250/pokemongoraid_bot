@@ -86,34 +86,5 @@ bot.command("delete", async (ctx) => {
     await ctx.reply(`Raid ${raidId} eliminato con successo.`);
 });
 
-// bot.command("raidsinfo", async (ctx) => {
-//     if (raids.size === 0) {
-//         return ctx.reply("❌ Non ci sono raid attivi al momento.");
-//     }
-
-//     const raidList = Array.from(raids.values())
-//         .map(r => `🆔 ${r.id} - ${raidMessageMap.get(r.id)}`)
-//         .join("\n");
-
-//     await ctx.reply(`📋 Raid attivi:\n\n${raidList}`);
-// });
-
-// Middleware per intercettare tutti i messaggi
-// bot.on("message", (ctx) => {
-//     const text = ctx.message?.text;
-//     if (!text) return; // solo messaggi di testo
-
-//     // Cerca pattern "ID Raid: <numero>"
-//     const match = text.match(/ID Raid: (\d+)/);
-//     if (match) {
-//         const raidId = match[1];
-//         const messageId = ctx.message.message_id;
-
-//         // Salva l'associazione
-//         raidMessageMap.set(raidId, messageId);
-//         console.log(`Associato Raid ${raidId} al messaggio ${messageId}`);
-//     }
-// });
-
 bot.start({ drop_pending_updates: true });
 console.log("Bot avviato!");
