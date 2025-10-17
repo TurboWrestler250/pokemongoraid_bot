@@ -20,14 +20,14 @@ import { listenerCommands } from "./utils/listenerCommands.js";
 dotenv.config();
 
 // Leggi il JSON
-const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
-const bosses = JSON.parse(rawData);
+// const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
+// const bosses = JSON.parse(rawData);
 
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
 const bot = new Bot(process.env.BOT_TOKEN);
-export const raids = new Map();				// Struttura dei raid memorizzati in memoria
+export const raids = new Map();           // Struttura dei raid memorizzati in memoria
 export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
 export const commands = ["raid", "raids", "info", "tag"];
 
