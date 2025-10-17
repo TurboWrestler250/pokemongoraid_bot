@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "start-sd": "node ScrapedDuck/ScrapedDuck-mio.js",
-    "start-bot": "node bot.js",
-    "dev": "nodemon bot.js"
+    "start-bot": "node src/bot.js",
+    "dev": "nodemon src/bot.js"
   },
   "keywords": [
     "telegram",
