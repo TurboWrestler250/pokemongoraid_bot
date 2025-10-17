@@ -8,24 +8,6 @@ export async function formatRaid(raid) {
     .map((p, i) => `${i + 1}. ${p.icon} ${p.name}${p.count > 1 ? " +" + (p.count - 1) : ""}`)
     .join("\n");
   const totalPlayers = raid.players.reduce((sum, p) => sum + p.count, 0);
-
-//   return `
-// 🔰 [${raid.pokemon.toUpperCase()}](${link}) 🔰
-// \t\t───────
-// Palestra\t\t: ${raid.palestra}
-// Coord.\t\t: \`${raid.coordinates[0].toFixed(6)}, ${raid.coordinates[1].toFixed(6)}\`
-// Location\t\t: ${process.env.LOCATION || "Gorizia"}
-// Ritrovo\t\t: ${raid.start}
-// Scadenza\t\t: ${raid.end || "?"}
-// \t\t───────
-// ${totalPlayers} giocatori confermati:
-// ${players || "Nessuno ancora"}
-// \t\t───────
-// ${raid.notes ? raid.notes : ""}
-// \t\t───────
-// Creatore: ${raid.creator}
-// ID Raid: ${raid.id}`;
-
   return `
 🔰 [${raid.pokemon.toUpperCase()}](${link}) 🔰
 \`      ───────\`

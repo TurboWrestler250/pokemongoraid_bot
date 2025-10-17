@@ -66,7 +66,7 @@ export function callback(bot) {
 function handleJoin(raid, userId, name, username, icon) {
     let player = raid.players.find((p) => p.userId === userId);
     if (!player) {
-        player = { userId, name, username, icon: icon, count: 1 };
+        player = { userId, name, username, icon, count: 1 };
         raid.players.push(player);
     } else {
         if (player.icon === icon) {
