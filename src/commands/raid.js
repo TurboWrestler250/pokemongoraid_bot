@@ -4,7 +4,7 @@ import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
+// import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 import { raids, raidMessageMap } from '../bot.js';
 
 export function raidCommand(bot) {
