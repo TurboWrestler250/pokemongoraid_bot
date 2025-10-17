@@ -9,7 +9,7 @@ import { raids, raidMessageMap } from '../bot.js';
 
 export function raidCommand(bot) {
   bot.command("raid", async (ctx) => {
-    fetchBosses();
+    // fetchBosses();
 
     const args = ctx.match?.split(" ") || [];
 

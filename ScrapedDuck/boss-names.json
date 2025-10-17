@@ -1,23 +1,25 @@
 {
     "raidBosses": [
-        "Pikachu",
-        "Magikarp",
-        "Shinx",
-        "Arcanine",
-        "Dragonite",
-        "Luxray",
-        "Palkia",
-        "Mega Pidgeot",
-        "Mega Gyarados"
+        "Pidgey",
+        "Porygon",
+        "Zigzagoon",
+        "Galarian Zigzagoon",
+        "Snorlax",
+        "Drampa",
+        "Wyrdeer",
+        "Dialga",
+        "Mega Kangaskhan",
+        "Mega Lopunny",
+        "Deoxis"
     ],
     "shadowRaidBosses": [
-        "Bellsprout",
-        "Aipom",
-        "Teddiursa",
-        "Seedot",
-        "Girafarig",
-        "Absol",
-        "Whirlipede",
+        "Drowzee",
+        "Ralts",
+        "Bagon",
+        "Snover",
+        "Scyther",
+        "Aerodactyl",
+        "Sableye",
         "Regigigas"
     ]
 }

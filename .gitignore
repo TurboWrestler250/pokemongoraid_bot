@@ -2,3 +2,7 @@
 node_modules/
 jspm_packages/
 package-lock.json
+
+# temp files
+ScrapedDuck/boss-names.json
+ScrapedDuck/changes.log
