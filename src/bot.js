@@ -39,7 +39,9 @@ if (isProduction) {
 const allowedUsers = [471651426];
 const allowedGroups = [-4915341478];
 bot.use(async (ctx, next) => {
-  if (!allowedUsers.includes(ctx.from.id) || !allowedGroups.includes(ctx.chat.id)) return; // filtra
+  if (!isProduction) {
+    if (!allowedUsers.includes(ctx.from.id) || !allowedGroups.includes(ctx.chat.id)) return; // filtra
+  }
   await next(); // passa al prossimo handler (comando, message, ecc.)
 });
 
