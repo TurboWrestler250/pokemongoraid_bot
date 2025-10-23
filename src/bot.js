@@ -29,7 +29,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 let bot;
 if (isProduction) {
     bot = new Bot(process.env.BOT_TOKEN);
-    bot.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN);
+    await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN);
     console.log('Bot avviato in modalità webhook (production)');
 } else {
     bot = new Bot(process.env.BOT_TOKEN, { polling: true });
