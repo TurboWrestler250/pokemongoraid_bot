@@ -1,6 +1,5 @@
 // Importa le librerie necessarie
 import dotenv from 'dotenv';
-import fs from "fs";
 
 import { Bot } from "grammy";
 // import { Message } from "grammy/types";
@@ -17,7 +16,7 @@ import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
 import { listenerCommands } from "./utils/listenerCommands.js";
 
-dotenv.config();
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 // Leggi il JSON
 // const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
@@ -25,7 +24,23 @@ dotenv.config();
 
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
-const bot = new Bot(process.env.BOT_TOKEN);
+
+const isProduction = process.env.NODE_ENV === 'production';
+let bot;
+if (isProduction) {
+    bot = new Bot(process.env.BOT_TOKEN);
+    bot.setWebHook('https://pokemongoraid-bot.on.shiper.app/' + botToken);
+    console.log('Bot avviato in modalità webhook (production)');
+} else {
+    bot = new Bot(process.env.BOT_TOKEN, { polling: true });
+    console.log('Bot avviato in modalità polling (development)');
+}
+
+const allowedUsers = 471651426;
+bot.on("message", (msg) => {
+  if (!allowedUsers.includes(msg.from.id)) return;
+  bot.sendMessage(msg.chat.id, "Risposta solo per test!");
+});
 
 export const raids = new Map();           // Struttura dei raid memorizzati in memoria
 export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
