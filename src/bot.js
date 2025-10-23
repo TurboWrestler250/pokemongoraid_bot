@@ -36,10 +36,11 @@ if (isProduction) {
     console.log('Bot avviato in modalità polling (development)');
 }
 
-const allowedUsers = 471651426;
-bot.on("message", (msg) => {
-  if (!allowedUsers.includes(msg.from.id)) return;
-  bot.sendMessage(msg.chat.id, "Risposta solo per test!");
+const allowedUsers = [471651426];
+const allowedGroups = [-4915341478];
+bot.use(async (ctx, next) => {
+  if (!allowedUsers.includes(ctx.from.id) || !allowedGroups.includes(ctx.chat.id)) return; // filtra
+  await next(); // passa al prossimo handler (comando, message, ecc.)
 });
 
 export const raids = new Map();           // Struttura dei raid memorizzati in memoria
