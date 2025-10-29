@@ -1,4 +1,4 @@
-import { raids } from '../bot.js';
+import { raids } from './raid.js';
 
 export function tagCommand(bot) {
     bot.command("tag", async (ctx) => {

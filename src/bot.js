@@ -6,6 +6,8 @@ import { Bot } from "grammy";
 // import bosses from './ScrapedDuck/boss-names.json' assert { type: 'json' };
 // import ScrapedDuck from 'ScrapedDuck';
 
+export const commands = ["raid", "raids", "info", "tag"];
+
 import { noteCommand } from "./commands/note.js";
 import { raidCommand } from "./commands/raid.js";
 import { raidsCommand } from "./commands/raids.js";
@@ -44,10 +46,6 @@ bot.use(async (ctx, next) => {
   }
   await next(); // passa al prossimo handler (comando, message, ecc.)
 });
-
-export const raids = new Map();           // Struttura dei raid memorizzati in memoria
-export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
-export const commands = ["raid", "raids", "info", "tag"];
 
 // COMANDI del bot
 await listenerCommands(bot);

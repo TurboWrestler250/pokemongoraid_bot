@@ -1,11 +1,14 @@
 // import { InlineKeyboard } from "grammy";
 // import { raids } from "../utils/raids.js";
+import Raid from "../models/raid.js";
 import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
+export const raids = new Map();           // Struttura dei raid memorizzati in memoria
+export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
+
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
-import { raids, raidMessageMap } from '../bot.js';
 
 export function raidCommand(bot) {
   bot.command("raid", async (ctx) => {
@@ -15,14 +18,11 @@ export function raidCommand(bot) {
 
     if (args.length < 3) {
       //                            0         1           2           3           4
-      return ctx.reply("Uso: /raid [pokemon] [palestra] [ora inizio] [ora fine?] [note?]");
+      return ctx.reply("Uso: /raid [pokemon] [gym] [ora inizio] [ora fine?] [note?]");
     }
 
     const pokemon = args[0] || "";
-    // const palestraWords = args[1];
-    const palestraInfo = findGymByKeywords(args[1]);
-    const palestra = palestraInfo.nome;
-    const coordinates = palestraInfo.coords;
+    const gym = findGymByKeywords(args[1]);
     const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
     const start = args[2] && timePattern.test(args[2]) ? args[2] : new Date().toTimeString().slice(0,5); // ora attuale HH:MM (primi 5 caratteri)
     let end = "";
@@ -34,52 +34,50 @@ export function raidCommand(bot) {
       notes = args.slice(3).join(" ");
     }
 
+    if (!gym) return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");
 
-    if (!palestraInfo) return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");
+    const raid = new Raid({
+      pokemon:  pokemon,
+      gym:      gym.nome,
+      lat:      gym.lat,
+      lon:      gym.lon,
+      start:    start,
+      end:      end,
+      notes:    notes,
+      creator:  ctx.from?.first_name
+    });
 
-    const raidId = Math.floor(Math.random() * 1000000).toString();
-    const raid = {
-      id: raidId,
-      pokemon,
-      palestra,
-      coordinates,
-      start,
-      end,
-      notes,
-      creator: ctx.from?.first_name || "Sconosciuto",
-      players: [],
-      };
+    // addRaid(bot, ctx, raid);
+    raids.set(raid.getId(), raid);
 
-    addRaid(bot, ctx, raid);
+    console.log(`Raid creato: ${raid.getPokemon()} - ID: ${raid.getId()}`);
+    scheduleRaidClose(bot, ctx, raid, timePattern);
 
     const sendMessage = await ctx.reply(await formatRaid(raid), { 
-      reply_markup: raidKeyboard(raidId),
+      reply_markup: raidKeyboard(raid.getId()),
       parse_mode: "Markdown",
       disable_web_page_preview: true
     });
     
-    raidMessageMap.set(raidId, sendMessage.message_id);
-    console.log(`Associato Raid ${raidId} al messaggio ${sendMessage.message_id}`);
+    raidMessageMap.set(raid.getId(), sendMessage.message_id);
+    console.log(`Associato Raid ${raid.getId()} al messaggio ${sendMessage.message_id}`);
   });
 }
 
-function addRaid(bot, ctx, raid) {
-  raids.set(raid.id, raid);
-
-  // Calcolo timeout
-  const [hours, minutes] = raid.end.split(":").map(Number); // raid.end = "15:30"
+function scheduleRaidClose(bot, ctx, raid, timePattern) {
   let delay;
-
-  if (raid.end) {
+  
+  if (raid.getTimeEnd() && timePattern.test(raid.getTimeEnd())) {
+    const [hours, minutes] = raid.getTimeEnd().split(":").map(Number);
     const now = new Date();
     const endTime = new Date(
-      now.getFullYear(),  // anno di oggi
-      now.getMonth(),     // mese di oggi (0-11)
-      now.getDate(),      // giorno di oggi
-      hours,              // ora che vuoi
-      minutes,            // minuti che vuoi
-      0,                  // secondi
-      0                   // millisecondi
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hours,
+      minutes,
+      0,
+      0
     );
     delay = endTime.getTime() - now.getTime();
   }
@@ -90,64 +88,56 @@ function addRaid(bot, ctx, raid) {
   }
 
   // Imposta timeout per distruggere il raid
-  raid.timeout = setTimeout(async () => {
-    clearInterval(raid.interval); // fermiamo il log
+  const timeout = setTimeout(async () => {
     await closeRaid(bot, ctx, raid);
   }, delay);
 
-  // Ogni 30 secondi mostra quanto manca
-  // raid.interval = setInterval(() => {
-  //   const now = new Date().getTime();
-  //   const remaining = delay - (now - raid.createdAt);
-
-  //   if (remaining <= 0) {
-  //     clearInterval(raid.interval);
-  //   } else {
-  //     const minutesLeft = Math.floor(remaining / 60000);
-  //     const secondsLeft = Math.floor((remaining % 60000) / 1000);
-  //     console.log(
-  //       `Raid ${raid.id}: rimangono ${minutesLeft}m ${secondsLeft}s`
-  //     );
-  //   }
-  // }, 10 * 1000);
-
-  // Salviamo anche l'istante di creazione per i calcoli
-  raid.createdAt = new Date().getTime();
+  // Salva il timeout nel raid (se vuoi poterlo cancellare in seguito)
+  // Nota: non puoi salvare timeout nella classe con proprietà private
+  // Considera di usare una Map esterna per i timeout
+  console.log(`Raid ${raid.getId()} sarà chiuso tra ${Math.round(delay / 60000)} minuti`);
 }
 
-function updateRaidEnd(raidId, newEnd) {
-  const raid = raids.get(raidId);
-  if (!raid) return;
+// function updateRaidEnd(newEnd) {
+//   const raid = raids.get(raid.getId()); 
+//   if (!raid) return;
 
-  // Cancella timeout precedente
-  if (raid.timeout) clearTimeout(raid.timeout);
+//   // Cancella timeout precedente
+//   if (raid.timeout) clearTimeout(raid.timeout);
 
-  raid.end = newEnd;
+//   raid.end = newEnd;
 
-  // Imposta nuovo timeout
-  addRaid(raid);
-}
+//   // Imposta nuovo timeout
+//   addRaid(raid);
+// }
 
 async function closeRaid(bot, ctx, raid) {
-  const raidMsgId = raidMessageMap.get(raid.id);
-  if (!raidMsgId) return;
+  const raidId = raid.getId();
+  const messageId = raidMessageMap.get(raidId);
 
-  // Se c’è un timeout attivo, lo puliamo
-  // if (raid.timeout) {
-  //   clearTimeout(raid.timeout);
-  // }
+  console.log(`Chiusura raid ${raidId}...`);
 
-    // Rimuovi il messaggio Telegram se esiste
-  if (raidMsgId) {
+  if (messageId) {
     try {
-      // await ctx.deleteMessage();
-      await bot.api.deleteMessage(ctx.chatId, raidMsgId);
+      // Modifica il messaggio per indicare che il raid è chiuso
+      const closedMessage = await formatRaid(raid) + "\n\n🔒 *Raid chiuso*";
+      await bot.api.editMessageText(ctx.chat.id, messageId, closedMessage, {
+        parse_mode: "Markdown",
+        disable_web_page_preview: true
+      });
+      
+      // Rimuovi la tastiera
+      await bot.api.editMessageReplyMarkup(ctx.chat.id, messageId, {
+        reply_markup: { inline_keyboard: [] }
+      });
     } catch (err) {
-      console.log("Errore eliminando messaggio:", err.description || err);
+      console.error(`Errore durante la chiusura del raid ${raidId}:`, err);
     }
   }
 
-  raids.delete(raid.id);
-  console.log(`Raid ${raid.id} chiuso`);
-  // Qui puoi anche aggiornare il messaggio su Telegram
+  // Rimuovi dalle Map
+  raids.delete(raidId);
+  raidMessageMap.delete(raidId);
+  
+  console.log(`Raid ${raidId} eliminato dalla memoria`);
 }
