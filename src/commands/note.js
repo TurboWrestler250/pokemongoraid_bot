@@ -1,4 +1,4 @@
-import { raids, raidMessageMap } from '../bot.js';
+import { raids, raidMessageMap } from './raid.js';
 
 import { raidKeyboard } from "../utils/keyboards.js";
 

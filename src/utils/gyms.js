@@ -35,10 +35,8 @@ export function findGymByKeywords(keyword) {
       if (gymKeywords.includes(search)) {
         return {
           nome: gym["Nome palestra"],
-          coords: [
-            parseFloat(gym["Latitudine"]),
-            parseFloat(gym["Longitudine"]),
-          ],
+          lat: gym["Latitudine"],
+          lon: gym["Longitudine"],
         };
       }
     }
