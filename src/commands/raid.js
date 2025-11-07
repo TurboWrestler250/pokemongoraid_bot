@@ -1,14 +1,38 @@
-// import { InlineKeyboard } from "grammy";
-// import { raids } from "../utils/raids.js";
+import { InlineKeyboard } from "grammy";
 import Raid from "../models/raid.js";
+import { dataPokemon } from '../utils/dataPokemon.js';
 import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
 export const raids = new Map();           // Struttura dei raid memorizzati in memoria
 export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
+const raidCallbacks = new Map();
+
+export function setupRaidListener(bot) {
+  bot.on("callback_query:data", async (ctx) => {
+    const [pokemonName, raidId] = ctx.callbackQuery.data.split(":");
+    if (raidCallbacks.has(raidId)) {
+      const resolve = raidCallbacks.get(raidId);
+      resolve(pokemonName);           // risolve la Promise
+      raidCallbacks.delete(raidId);  // rimuove la callback
+      await ctx.answerCallbackQuery(); 
+    }
+  });
+}
 
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
+
+// step 0 : verificare se ha tutti i parametri richiesti
+// step 1 : ricevere nome del pokemon
+// verificare se nella lista compaiono più forme del pokemon
+// negativo, assegnare il nome della lista
+// affermativo, chiedere di sceglierne uno
+// utilizzare il nome scelto dall'utene nel raid
+
+// listner/handler del bot per ascoltare il comando
+// se sono presenti più nomi, Promise per creare la scelta
+// creare il raid
 
 export function raidCommand(bot) {
   bot.command("raid", async (ctx) => {
@@ -21,6 +45,7 @@ export function raidCommand(bot) {
       return ctx.reply("Uso: /raid [pokemon] [gym] [ora inizio] [ora fine?] [note?]");
     }
 
+    const id = Math.floor(Math.random()*1000000);
     const pokemon = args[0] || "";
     const gym = findGymByKeywords(args[1]);
     const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -36,8 +61,31 @@ export function raidCommand(bot) {
 
     if (!gym) return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");
 
+    let pokemon_api;
+    const data_pokemon = await dataPokemon(pokemon.toLowerCase());
+    if (data_pokemon.length < 1) console.log("qui c'è un problema");
+    if (data_pokemon.length === 1) pokemon_api = pokemon;
+    if (data_pokemon.length > 1) {
+      const inlineKeyboard = new InlineKeyboard();
+      for (const pokemon of data_pokemon) {
+        inlineKeyboard.text(pokemon.name, pokemon.name+":"+id).row()
+      }
+      await ctx.reply("Che pokemon scegli?", { 
+        reply_markup: inlineKeyboard,
+        parse_mode: "Markdown",
+        disable_web_page_preview: true
+      });
+      console.log(new Date().toLocaleString(), "Sto per fare la Promise per il nome dentro il comando /raid");
+      pokemon_api = await new Promise((resolve) => {
+        console.log(new Date().toLocaleString(), "sono dentro la Promise della scelta del nome");
+        raidCallbacks.set(id.toString(), resolve);
+        console.log(new Date().toLocaleString(), "dopo la Promise della scelta del nome")
+      });
+    };
+
     const raid = new Raid({
-      pokemon:  pokemon,
+      id:       id,
+      pokemon:  pokemon_api,
       gym:      gym.nome,
       lat:      gym.lat,
       lon:      gym.lon,

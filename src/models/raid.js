@@ -12,8 +12,8 @@ class Raid {
     #created_at;
     #updated_at;
     
-    constructor ({pokemon, gym, lat, lon, start, end, notes, creator}) {
-        this.#id = Math.floor(Math.random()*1000000);
+    constructor ({id, pokemon, gym, lat, lon, start, end, notes, creator}) {
+        this.#id = id;
         this.#pokemon = pokemon;
         this.#gym = gym;
         this.#latitudine = typeof lat === 'number' ? lat : parseFloat(lat);

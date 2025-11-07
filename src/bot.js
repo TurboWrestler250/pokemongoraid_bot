@@ -9,7 +9,7 @@ import { Bot } from "grammy";
 export const commands = ["raid", "raids", "info", "tag"];
 
 import { noteCommand } from "./commands/note.js";
-import { raidCommand } from "./commands/raid.js";
+import { raidCommand, setupRaidListener } from "./commands/raid.js";
 import { raidsCommand } from "./commands/raids.js";
 import { tagCommand } from "./commands/tag.js";
 import { infoCommand } from "./commands/info.js";
@@ -50,6 +50,7 @@ bot.use(async (ctx, next) => {
 // COMANDI del bot
 await listenerCommands(bot);
 raidCommand(bot);
+setupRaidListener(bot);
 raidsCommand(bot);
 tagCommand(bot);
 noteCommand(bot);
