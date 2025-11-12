@@ -73,7 +73,9 @@ export function raidCommand(bot) {
       await ctx.reply("Che pokemon scegli?", { 
         reply_markup: inlineKeyboard,
         parse_mode: "Markdown",
-        disable_web_page_preview: true
+        link_preview_options: {
+          is_disabled: true,
+        }
       });
       console.log(new Date().toLocaleString(), "Sto per fare la Promise per il nome dentro il comando /raid");
       pokemon_api = await new Promise((resolve) => {
@@ -104,7 +106,9 @@ export function raidCommand(bot) {
     const sendMessage = await ctx.reply(await formatRaid(raid), { 
       reply_markup: raidKeyboard(raid.getId()),
       parse_mode: "Markdown",
-      disable_web_page_preview: true
+      link_preview_options: {
+          is_disabled: true,
+        }
     });
     
     raidMessageMap.set(raid.getId(), sendMessage.message_id);
@@ -132,13 +136,17 @@ function scheduleRaidClose(bot, ctx, raid, timePattern) {
 
   // Se non c'è end o end è passato, imposta 6 ore di default
   if (!delay || delay <= 0) {
-    delay = 6 * 60 * 60 * 1000; // 6 ore in ms
+    delay = 12 * 60 * 60 * 1000; // 12 ore in ms
   }
 
   // Imposta timeout per distruggere il raid
-  const timeout = setTimeout(async () => {
+  setTimeout(async () => {
+  try {
     await closeRaid(bot, ctx, raid);
-  }, delay);
+  } catch (err) {
+    console.error("Errore nella chiusura del raid:", err);
+  }
+}, delay);
 
   // Salva il timeout nel raid (se vuoi poterlo cancellare in seguito)
   // Nota: non puoi salvare timeout nella classe con proprietà private
@@ -169,9 +177,12 @@ async function closeRaid(bot, ctx, raid) {
     try {
       // Modifica il messaggio per indicare che il raid è chiuso
       const closedMessage = await formatRaid(raid) + "\n\n🔒 *Raid chiuso*";
-      await bot.api.editMessageText(ctx.chat.id, messageId, closedMessage, {
+      await ctx.editMessageText(ctx.chat.id, messageId, closedMessage, {
         parse_mode: "Markdown",
-        disable_web_page_preview: true
+        reply_markup: { inline_keyboard: [] },
+        link_preview_options: {
+          is_disabled: true,
+        }
       });
       
       // Rimuovi la tastiera
