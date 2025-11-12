@@ -1,4 +1,4 @@
-import { InlineKeyboard } from "grammy";
+// import { InlineKeyboard } from "grammy";
 import Raid from "../models/raid.js";
 import { dataPokemon } from '../utils/dataPokemon.js';
 import { formatRaid } from "../utils/formatRaid.js";
@@ -141,16 +141,12 @@ function scheduleRaidClose(bot, ctx, raid, timePattern) {
 
   // Imposta timeout per distruggere il raid
   setTimeout(async () => {
-  try {
-    await closeRaid(bot, ctx, raid);
-  } catch (err) {
-    console.error("Errore nella chiusura del raid:", err);
-  }
-}, delay);
-
-  // Salva il timeout nel raid (se vuoi poterlo cancellare in seguito)
-  // Nota: non puoi salvare timeout nella classe con proprietà private
-  // Considera di usare una Map esterna per i timeout
+    try {
+      await closeRaid(bot, ctx, raid);
+    } catch (err) {
+      console.error("Errore nella chiusura del raid:", err);
+    }
+  }, delay);
   console.log(`Raid ${raid.getId()} sarà chiuso tra ${Math.round(delay / 60000)} minuti`);
 }
 
@@ -183,11 +179,6 @@ async function closeRaid(bot, ctx, raid) {
         link_preview_options: {
           is_disabled: true,
         }
-      });
-      
-      // Rimuovi la tastiera
-      await bot.api.editMessageReplyMarkup(ctx.chat.id, messageId, {
-        reply_markup: { inline_keyboard: [] }
       });
     } catch (err) {
       console.error(`Errore durante la chiusura del raid ${raidId}:`, err);
