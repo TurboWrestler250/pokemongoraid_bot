@@ -9,10 +9,11 @@ import { Bot } from "grammy";
 export const commands = ["raid", "raids", "info", "tag"];
 
 import { noteCommand } from "./commands/note.js";
-import { raidCommand, setupRaidListener } from "./commands/raid.js";
+import { raidCommand/*, setupRaidListener*/ } from "./commands/raid.js";
 import { raidsCommand } from "./commands/raids.js";
 import { tagCommand } from "./commands/tag.js";
 import { infoCommand } from "./commands/info.js";
+import { database } from "./commands/database.js";
 
 import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
@@ -50,12 +51,13 @@ bot.use(async (ctx, next) => {
 // COMANDI del bot
 await listenerCommands(bot);
 raidCommand(bot);
-setupRaidListener(bot);
+// setupRaidListener(bot);
 raidsCommand(bot);
 tagCommand(bot);
 noteCommand(bot);
 callback(bot);
 infoCommand(bot);
+database(bot);
 
 bot.command("d", async (ctx) => {
   if (!ctx.message?.reply_to_message) {

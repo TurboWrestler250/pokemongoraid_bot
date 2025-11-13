@@ -69,7 +69,9 @@ export function callback(bot) {
             await ctx.editMessageText(await formatRaid(raid), {
                 reply_markup: raidKeyboard(raidId),
                 parse_mode: "Markdown",
-                disable_web_page_preview: true
+                link_preview_options: {
+                    is_disabled: true,
+                }
             });
             await ctx.answerCallbackQuery();
         } catch (err) {

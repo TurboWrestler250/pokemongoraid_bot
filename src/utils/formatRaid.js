@@ -1,11 +1,11 @@
 // import { InlineKeyboard } from "grammy";
-// import { dataPokemon } from '../utils/dataPokemon.js';
+import { dataPokemon } from '../utils/dataPokemon.js';
 
 export async function formatRaid(raid) {
-    // if (!raid.pokemon) return "Errore: Pokemon non specificato.";
-    // if (!raid.getPokemon()) return "Errore: Pokemon non specificato.";
+    if (!raid.getPokemon()) console.error("Errore: Pokemon non specificato.");
+    if (!raid.getPokemon()) return "Errore: Pokemon non specificato.";
 
-    // const pokemon = await dataPokemon(raid.getPokemon().toLowerCase());
+    const pokemon = await dataPokemon(raid.getPokemon().toLowerCase());
     const link = `https://db.pokemongohub.net/pokemon/${pokemon.id}/`;
 
     const players = raid.getPlayers()

@@ -1,4 +1,4 @@
-// import { InlineKeyboard } from "grammy";
+import { InlineKeyboard } from "grammy";
 import Raid from "../models/raid.js";
 import { dataPokemon } from '../utils/dataPokemon.js';
 import { formatRaid } from "../utils/formatRaid.js";
@@ -9,17 +9,17 @@ export const raids = new Map();           // Struttura dei raid memorizzati in m
 export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
 const raidCallbacks = new Map();
 
-export function setupRaidListener(bot) {
-  bot.on("callback_query:data", async (ctx) => {
-    const [pokemonName, raidId] = ctx.callbackQuery.data.split(":");
-    if (raidCallbacks.has(raidId)) {
-      const resolve = raidCallbacks.get(raidId);
-      resolve(pokemonName);           // risolve la Promise
-      raidCallbacks.delete(raidId);  // rimuove la callback
-      await ctx.answerCallbackQuery(); 
-    }
-  });
-}
+// export function setupRaidListener(bot) {
+//   bot.on("callback_query:data", async (ctx) => {
+//     const [pokemonName, raidId] = ctx.callbackQuery.data.split(":");
+//     if (raidCallbacks.has(raidId)) {
+//       const resolve = raidCallbacks.get(raidId);
+//       resolve(pokemonName);           // risolve la Promise
+//       raidCallbacks.delete(raidId);  // rimuove la callback
+//       await ctx.answerCallbackQuery(); 
+//     }
+//   });
+// }
 
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 
@@ -61,33 +61,33 @@ export function raidCommand(bot) {
 
     if (!gym) return ctx.reply("Nome palestra errato, riprova con un nuovo comando.");
 
-    let pokemon_api;
-    const data_pokemon = await dataPokemon(pokemon.toLowerCase());
-    if (data_pokemon.length < 1) console.log("qui c'è un problema");
-    if (data_pokemon.length === 1) pokemon_api = pokemon;
-    if (data_pokemon.length > 1) {
-      const inlineKeyboard = new InlineKeyboard();
-      for (const pokemon of data_pokemon) {
-        inlineKeyboard.text(pokemon.name, pokemon.name+":"+id).row()
-      }
-      await ctx.reply("Che pokemon scegli?", { 
-        reply_markup: inlineKeyboard,
-        parse_mode: "Markdown",
-        link_preview_options: {
-          is_disabled: true,
-        }
-      });
-      console.log(new Date().toLocaleString(), "Sto per fare la Promise per il nome dentro il comando /raid");
-      pokemon_api = await new Promise((resolve) => {
-        console.log(new Date().toLocaleString(), "sono dentro la Promise della scelta del nome");
-        raidCallbacks.set(id.toString(), resolve);
-        console.log(new Date().toLocaleString(), "dopo la Promise della scelta del nome")
-      });
-    };
+    // let pokemon_api;
+    // const data_pokemon = await dataPokemon(pokemon.toLowerCase());
+    // if (data_pokemon.length < 1) console.log("qui c'è un problema");
+    // if (data_pokemon.length === 1) pokemon_api = pokemon;
+    // if (data_pokemon.length > 1) {
+    //   const inlineKeyboard = new InlineKeyboard();
+    //   for (const pokemon of data_pokemon) {
+    //     inlineKeyboard.text(pokemon.name, pokemon.name+":"+id).row()
+    //   }
+      // await ctx.reply("Che pokemon scegli?", { 
+      //   reply_markup: inlineKeyboard,
+      //   parse_mode: "Markdown",
+      //   link_preview_options: {
+      //     is_disabled: true,
+      //   }
+      // });
+      // console.log(new Date().toLocaleString(), "Sto per fare la Promise per il nome dentro il comando /raid");
+      // pokemon_api = await new Promise((resolve) => {
+      //   console.log(new Date().toLocaleString(), "sono dentro la Promise della scelta del nome");
+      //   raidCallbacks.set(id.toString(), resolve);
+      //   console.log(new Date().toLocaleString(), "dopo la Promise della scelta del nome")
+      // });
+    // };
 
     const raid = new Raid({
       id:       id,
-      pokemon:  pokemon_api,
+      pokemon:  pokemon,
       gym:      gym.nome,
       lat:      gym.lat,
       lon:      gym.lon,
@@ -131,18 +131,19 @@ function scheduleRaidClose(bot, ctx, raid, timePattern) {
       0,
       0
     );
-    delay = endTime.getTime() - now.getTime();
+    // Se non c'è end o end è passato, imposta 12 ore di default
+    delay = endTime.getTime() - now.getTime()
+    console.log(`Delay deciso dall'utente per raid ${raid.getId()}: ${Math.round(delay / 60000)} minuti`);
+    // l'untente non inserisce un orario di fine oppure orario di inizio e di fine coincidono
+    if (!delay || delay <= 0) delay = 12 * 60 * 60 * 1000;
+    console.log(`Calcolato delay per raid ${raid.getId()}: ${Math.round(delay / 60000)} minuti`);
   }
-
-  // Se non c'è end o end è passato, imposta 6 ore di default
-  if (!delay || delay <= 0) {
-    delay = 12 * 60 * 60 * 1000; // 12 ore in ms
-  }
+  
 
   // Imposta timeout per distruggere il raid
   setTimeout(async () => {
     try {
-      await closeRaid(bot, ctx, raid);
+      await closeRaid(ctx, raid);
     } catch (err) {
       console.error("Errore nella chiusura del raid:", err);
     }
@@ -163,7 +164,7 @@ function scheduleRaidClose(bot, ctx, raid, timePattern) {
 //   addRaid(raid);
 // }
 
-async function closeRaid(bot, ctx, raid) {
+async function closeRaid(ctx, raid) {
   const raidId = raid.getId();
   const messageId = raidMessageMap.get(raidId);
 
@@ -172,6 +173,7 @@ async function closeRaid(bot, ctx, raid) {
   if (messageId) {
     try {
       // Modifica il messaggio per indicare che il raid è chiuso
+      console.log(`Modifico il messaggio ${messageId} per il raid ${raidId} come chiuso`);
       const closedMessage = await formatRaid(raid) + "\n\n🔒 *Raid chiuso*";
       await ctx.editMessageText(ctx.chat.id, messageId, closedMessage, {
         parse_mode: "Markdown",

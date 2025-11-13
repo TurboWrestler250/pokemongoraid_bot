@@ -1,7 +1,8 @@
 export async function dataPokemon(pokemon) {
-    // if (pokemon === "shaymin") pokemon = "shaymin-land";
-    // if (pokemon === "deoxys") pokemon = "deoxys-normal";
-    // if (pokemon === "giratina") pokemon = "giratina-altered";
+    // console.log("pokemon in dataPokemon:", pokemon);
+    if (pokemon === "shaymin") pokemon = "shaymin-land";
+    if (pokemon === "deoxys") pokemon = "deoxys-normal";
+    if (pokemon === "giratina") pokemon = "giratina-altered";
 
     const API_POKEMON = "https://pokeapi.co/api/v2/pokemon/";
     let count;
