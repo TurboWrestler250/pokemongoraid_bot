@@ -7,15 +7,11 @@ export async function database(bot) {
     try {
       // await getConnection();
       console.log('Connecting to:', process.env.DB_HOST);
-      console.log('Connecting to:', process.env.DB_PORT);
-      console.log('Connecting to:', process.env.DB_USER);
-      console.log('Connecting to:', process.env.DB_PASSWORD);
-      console.log('Connecting to:', process.env.DB_NAME);
       const [rows] = await query(sql);
       console.log("Righe: " + rows);
       // console.log(fields);
-      ctx.reply("Ecco la connessione al database:");
-      ctx.reply(rows);
+      await ctx.reply("Ecco la connessione al database:");
+      await ctx.reply(rows);
     } catch (err) {
       console.error(err);
     }

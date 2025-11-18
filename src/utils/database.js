@@ -6,6 +6,7 @@ dotenv.config({ path: `.env.development` });
 // Configurazione della connessione
 // console.log('Connecting to:', process.env.DB_HOST);
 
+
 let pool;
 try {
   pool = mysql.createPool({

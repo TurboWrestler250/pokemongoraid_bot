@@ -19,7 +19,9 @@ import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
 import { listenerCommands } from "./utils/listenerCommands.js";
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+const cfg = dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+
+console.log("Environment:", cfg);
 
 // Leggi il JSON
 // const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
@@ -57,7 +59,7 @@ tagCommand(bot);
 noteCommand(bot);
 callback(bot);
 infoCommand(bot);
-database(bot);
+await database(bot);
 
 bot.command("d", async (ctx) => {
   if (!ctx.message?.reply_to_message) {
