@@ -2,11 +2,32 @@ import { formatRaid } from "../utils/formatRaid.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
 import { raids, raidMessageMap } from '../commands/raid.js';
+import { resolvePicker } from './picker.js';
 
 const refreshCooldown = new Map(); // userId -> timestamp ultimo uso
 
 export function callback(bot) {
     bot.on("callback_query:data", async (ctx) => {
+        // Gestione selezione picker (callback_data form: 'pickpoke|<token>|<name>')
+        try {
+            const data = ctx.callbackQuery.data;
+            if (data && data.startsWith('pickpoke|')) {
+                const parts = data.split('|');
+                const token = parts[1];
+                const selection = parts.slice(2).join('|');
+                const resolved = resolvePicker(token, selection);
+                if (resolved) {
+                    await ctx.answerCallbackQuery({ text: `Selezionato: ${selection}` });
+                    try { await ctx.deleteMessage(); } catch (e) { /* ignore */ }
+                } else {
+                    await ctx.answerCallbackQuery({ text: 'Selezione non valida o scaduta', show_alert: true });
+                }
+                return;
+            }
+        } catch (err) {
+            console.error('Errore gestione picker callback:', err);
+        }
+
         console.log(ctx.callbackQuery.data);
         const [action, raidId, icon] = ctx.callbackQuery.data.split(":");
         if (!raidId) return ctx.answerCallbackQuery();

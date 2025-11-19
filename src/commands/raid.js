@@ -1,4 +1,3 @@
-// import { InlineKeyboard } from "grammy";
 // import { raids } from "../utils/raids.js";
 import Raid from "../models/raid.js";
 import { formatRaid } from "../utils/formatRaid.js";
@@ -53,7 +52,7 @@ export function raidCommand(bot) {
     console.log(`Raid creato: ${raid.getPokemon()} - ID: ${raid.getId()}`);
     scheduleRaidClose(bot, ctx, raid, timePattern);
 
-    const sendMessage = await ctx.reply(await formatRaid(raid), { 
+    const sendMessage = await ctx.reply(await formatRaid(ctx, raid), { 
       reply_markup: raidKeyboard(raid.getId()),
       parse_mode: "Markdown",
       disable_web_page_preview: true

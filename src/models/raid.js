@@ -39,6 +39,11 @@ class Raid {
     getNotes() { return this.#notes; }
     getCreator() { return this.#creator_first_name; }
 
+    setPokemon(name) {
+        this.#pokemon = name;
+        this.#updated_at = new Date().toLocaleString();
+    }
+
     addPlayer(player) {
         this.#players.push(player);
         this.#updated_at = new Date().toLocaleString();

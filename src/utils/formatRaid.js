@@ -1,11 +1,30 @@
+import { InlineKeyboard } from "grammy";
 import { dataPokemon } from '../utils/dataPokemon.js';
+// import { multiPokemon } from '../utils/multiPokemon.js';
 
-export async function formatRaid(raid) {
-  // if (!raid.pokemon) return "Errore: Pokemon non specificato.";
+export async function formatRaid(ctx, raid) {
   if (!raid.getPokemon()) return "Errore: Pokemon non specificato.";
 
-  const pokemon = await dataPokemon(raid.getPokemon().toLowerCase());
+  // const pokemon = await multiPokemon();
+  const pokemon = await dataPokemon(raid.getPokemon().toLowerCase()); // sempre oggetto
+  console.log("pokemon in formatRaid:", typeof(pokemon), pokemon);
+
+  if (pkm.length > 1) {
+    // posso fare anche pkm.map(p => p) perché ci sono solo name e url nell'oggetto
+    // const pokemon_list = pkm.map(p => ({ name: p.name, url: p.url }));
+    const pokemon_list = pkm.map(([label, data]) => InlineKeyboard.text(label, data));
+    const keyboard = InlineKeyboard.from([buttonRow]);
+
+    await ctx.reply(`Che forma di ${pkm} vuoi selezionare?`), { 
+      reply_markup: keyboard,
+      parse_mode: "Markdown",
+      disable_web_page_preview: true
+    };
+  }
+
   const link = `https://db.pokemongohub.net/pokemon/${pokemon.id}/`;
+
+  
 
   const players = raid.getPlayers()
     .map((p, i) => `${i + 1}. ${p.icon} ${p.name}${p.count > 1 ? " +" + (p.count - 1) : ""}`)
