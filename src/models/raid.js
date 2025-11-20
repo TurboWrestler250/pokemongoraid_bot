@@ -1,5 +1,6 @@
 class Raid {
     #id;
+    #id_messagge;
     #pokemon;
     #gym;
     #latitudine;
@@ -14,6 +15,7 @@ class Raid {
     
     constructor ({pokemon, gym, lat, lon, start, end, notes, creator}) {
         this.#id = Math.floor(Math.random()*1000000);
+        this.#id_messagge = 0;
         this.#pokemon = pokemon;
         this.#gym = gym;
         this.#latitudine = typeof lat === 'number' ? lat : parseFloat(lat);
@@ -28,6 +30,7 @@ class Raid {
     }
 
     getId() { return this.#id; }
+    getIdMessagge() { return this.#id_messagge; }
     getPokemon() { return this.#pokemon; }
     getGym() { return this.#gym; }
     getCoordinates() { return [this.#latitudine, this.#longitudine]; }
@@ -38,6 +41,27 @@ class Raid {
     getPlayers() { return this.#players; }
     getNotes() { return this.#notes; }
     getCreator() { return this.#creator_first_name; }
+
+    toJSON() {
+        return {
+            id: this.#id,
+            id_message: this.#id_messagge,
+            pokemon: this.#pokemon,
+            gym: this.#gym,
+            coordinates: [this.#latitudine, this.#longitudine],
+            latitudine: this.#latitudine,
+            longitudine: this.#longitudine,
+            time_start: this.#time_start,
+            time_end: this.#time_end,
+            players: this.#players,
+            notes: this.#notes,
+            creator_first_name: this.#creator_first_name,
+            created_at: this.#created_at,
+            updated_at: this.#updated_at
+        };
+    }
+
+    setIdMessagge(id) { this.#id_messagge = id; }
 
     addPlayer(player) {
         this.#players.push(player);

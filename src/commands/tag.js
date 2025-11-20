@@ -1,42 +1,45 @@
-import { raids } from './raid.js';
+import { raids } from '../commands/raid.js';
 
 export function tagCommand(bot) {
     bot.command("tag", async (ctx) => {
+        const flag = true;
         // Controlla che il comando sia in risposta a un messaggio
+        console.assert(flag, ctx.message.reply_to_message);
         if (!ctx.message?.reply_to_message) {
             return ctx.reply("❌ Devi rispondere a un messaggio di raid con /tag.");
         }
 
         // Prendi il testo passato come parametro
         const tagText = ctx.match?.trim();
+        console.assert(flag, tagText);
         if (!tagText) {
             return ctx.reply("❌ Devi specificare il testo da inviare.");
         }
 
-        // Cerca l'ID raid nel messaggio a cui si sta rispondendo
-        const repliedText = ctx.message.reply_to_message.text;
-        const raidIdMatch = repliedText.match(/ID Raid: (\S+)/);
-        if (!raidIdMatch) {
-            return ctx.reply("❌ Non riesco a trovare l'ID del raid nel messaggio a cui hai risposto.");
-        }
-        const raidId = raidIdMatch[1];
-        const raid = raids.get(raidId);
+        // Ricerca del Raid (Usando il getter)
+        const message_id = ctx.message.reply_to_message.message_id;
+        const raid = raids.find(r => r.getIdMessagge() === message_id);
 
         if (!raid) {
-            return ctx.reply("❌ Raid non trovato!");
+            console.log(`❌ Tentativo di tag su message_id: ${message_id}`);
+            console.log("ID Messaggio dei raid in memoria:", raids.map(r => r.getIdMessagge()));
+            return ctx.reply("❌ Raid non trovato (il messaggio potrebbe essere troppo vecchio o non è un raid valido).");
         }
 
-        // Prendi le menzioni degli utenti Telegram presenti nel raid
-        const usernames = raid.players.map(p => {
-            // Se hai salvato user_id e username
-            if (p.user_id && p.username) {
-                return `@${p.username}`;
-            }
-            // Fallback: solo username
-            return `@${p.username || p.name || "utente"}`;
-        }).join('\n') || "Nessun utente nel raid.";
+        // Generazione dei Tag (Usa il getter e filtra)
+        const usernames = raid.getPlayers()
+            // Filtra solo quelli che hanno un username valido per il tag (@)
+            .filter(p => p.username)
+            // Mappa al formato @username e unisce con spazio
+            .map(p => `@${p.username}`) 
+            .join(' '); 
 
-        // Rispondi con il testo e i username
+        if (!usernames) {
+            // Se non ci sono utenti taggabili
+            return ctx.reply("Non ci sono utenti con un username Telegram nel raid da taggare.");
+        }
+
+        // Risposta finale
         await ctx.reply(`${tagText}\n\n${usernames}`);
     });
 }
