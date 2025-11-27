@@ -52,7 +52,7 @@ export function callback(bot) {
                 });
 
                 // Aggiorna la mappa messaggi raid
-                raid.setIdMessagge(sendMessage.message_id);
+                raid.setIdMessagge(newMessage.message_id);
 
                 return ctx.answerCallbackQuery({ text: "🔄 Raid aggiornato!" });
             } catch (err) {
