@@ -38,14 +38,14 @@ if (isProduction) {
     console.log('Bot avviato in modalità polling (development)');
 }
 
-const allowedUsers = [471651426];
-const allowedGroups = [-4915341478];
-bot.use(async (ctx, next) => {
-  if (!isProduction) {
-    if (!allowedUsers.includes(ctx.from.id) || !allowedGroups.includes(ctx.chat.id)) return; // filtra
-  }
-  await next(); // passa al prossimo handler (comando, message, ecc.)
-});
+// const allowedUsers = [471651426];
+// const allowedGroups = [-4915341478];
+// bot.use(async (ctx, next) => {
+//   if (!isProduction) {
+//     if (!allowedUsers.includes(ctx.from.id) || !allowedGroups.includes(ctx.chat.id)) return; // filtra
+//   }
+//   await next(); // passa al prossimo handler (comando, message, ecc.)
+// });
 
 // COMANDI del bot
 await listenerCommands(bot);

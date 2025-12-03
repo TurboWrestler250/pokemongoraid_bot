@@ -4,8 +4,7 @@ import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-export const raids = new Map();           // Struttura dei raid memorizzati in memoria
-export const raidMessageMap = new Map();	// Dizionario per associare raid ID -> Telegram message ID
+export const raids = [];           // Struttura dei raid memorizzati in memoria
 
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 
@@ -47,7 +46,13 @@ export function raidCommand(bot) {
     });
 
     // addRaid(bot, ctx, raid);
-    raids.set(raid.getId(), raid);
+    // raids.set(raid.getId(), raid);
+    
+    // console.log("Raid salvati:", typeof(raids), raids);
+    // console.log("Raid trovato:", typeof(raids.get(raid.getId())), raids.get(raid.getId()));
+    // console.log("Pokémon:", raids.get(raid.getId()).getPokemon());
+    // console.log("Palestra:", raids.get(raid.getId()).getGym());
+    // console.log("ID:", raids.get(raid.getId()).getId());
 
     console.log(`Raid creato: ${raid.getPokemon()} - ID: ${raid.getId()}`);
     scheduleRaidClose(bot, ctx, raid, timePattern);
@@ -57,9 +62,13 @@ export function raidCommand(bot) {
       parse_mode: "Markdown",
       disable_web_page_preview: true
     });
-    
-    raidMessageMap.set(raid.getId(), sendMessage.message_id);
-    console.log(`Associato Raid ${raid.getId()} al messaggio ${sendMessage.message_id}`);
+
+    raid.setIdMessagge(sendMessage.message_id);
+    raids.push(raid);
+    console.log(`Associato Raid ${raid.getId()} al messaggio ${raid.getIdMessagge()}`);
+
+    // console.log(`Raid appena creato:`, typeof(raid), raid.toJSON());
+    // console.log(`Raids saltati in memoria`, typeof(raids), JSON.stringify(raids, null, 2));
   });
 }
 
@@ -112,7 +121,7 @@ function scheduleRaidClose(bot, ctx, raid, timePattern) {
 
 async function closeRaid(bot, ctx, raid) {
   const raidId = raid.getId();
-  const messageId = raidMessageMap.get(raidId);
+  const messageId = raid.getIdMessagge();
 
   console.log(`Chiusura raid ${raidId}...`);
 
@@ -136,7 +145,7 @@ async function closeRaid(bot, ctx, raid) {
 
   // Rimuovi dalle Map
   raids.delete(raidId);
-  raidMessageMap.delete(raidId);
+  // raidMessageMap.delete(raidId);
   
   console.log(`Raid ${raidId} eliminato dalla memoria`);
 }

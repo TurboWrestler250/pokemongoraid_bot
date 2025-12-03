@@ -1,7 +1,7 @@
 import { formatRaid } from "../utils/formatRaid.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-import { raids, raidMessageMap } from '../commands/raid.js';
+import { raids } from '../commands/raid.js';
 import { resolvePicker } from './picker.js';
 
 const refreshCooldown = new Map(); // userId -> timestamp ultimo uso
@@ -30,10 +30,10 @@ export function callback(bot) {
 
         console.log(ctx.callbackQuery.data);
         const [action, raidId, icon] = ctx.callbackQuery.data.split(":");
-        if (!raidId) return ctx.answerCallbackQuery();
+        if (!raidId) return ctx.answerCallbackQuery("RaidId non trovato!");
         
-        const raid = raids.get(Number(raidId));
-        console.log(raid);
+        const raid = raids.find(r => r.getId() === Number(raidId));
+        // console.log(raid);
         if (!raid) return ctx.answerCallbackQuery("Raid non trovato!");
 
         const userId = ctx.from.id;
@@ -73,7 +73,7 @@ export function callback(bot) {
                 });
 
                 // Aggiorna la mappa messaggi raid
-                raidMessageMap.set(raidId, newMessage.message_id);
+                raid.setIdMessagge(newMessage.message_id);
 
                 return ctx.answerCallbackQuery({ text: "🔄 Raid aggiornato!" });
             } catch (err) {
