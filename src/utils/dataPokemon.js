@@ -31,24 +31,26 @@ export async function dataPokemon(pokemon) {
             throw new Error('Pokemon non trovato nella lista');
         }
 
-        // Se c'è un solo risultato, ritorna i dati completi (fetch al dettaglio)
-        if (pkm.length === 1) {
-            try {
-                const detailRes = await fetch(API_POKEMON + pkm[0].name);
-                if (!detailRes.ok) throw new Error('Dettagli Pokemon non disponibili');
-                const detail = await detailRes.json();
-                return { id: detail.id, name: detail.name };
-            } catch (err) {
-                console.error('Errore fetching dettaglio Pokemon', err);
-                throw new Error('Dettagli Pokemon non disponibili');
-            }
-        }
+        return pkm.map(p => ({ name: p.name, url: p.url }));
 
-        // Più risultati: ritorna lista di opzioni (solo name e url)
-        if (pkm.length > 1) {
-            // posso fare anche pkm.map(p => p) perché ci sono solo name e url nell'oggetto
-            return pkm.map(p => ({ name: p.name, url: p.url }));
-        }
+        // // Se c'è un solo risultato, ritorna i dati completi (fetch al dettaglio)
+        // if (pkm.length === 1) {
+        //     try {
+        //         const detailRes = await fetch(API_POKEMON + pkm[0].name);
+        //         if (!detailRes.ok) throw new Error('Dettagli Pokemon non disponibili');
+        //         const detail = await detailRes.json();
+        //         return [{ id: detail.id, name: detail.name }];
+        //     } catch (err) {
+        //         console.error('Errore fetching dettaglio Pokemon', err);
+        //         throw new Error('Dettagli Pokemon non disponibili');
+        //     }
+        // }
+
+        // // Più risultati: ritorna lista di opzioni (solo name e url)
+        // if (pkm.length > 1) {
+        //     // posso fare anche pkm.map(p => p) perché ci sono solo name e url nell'oggetto
+        //     return pkm.map(p => ({ name: p.name, url: p.url }));
+        // }
     } catch (err) {
         console.error("Errore nella ricerca Pokemon", err);
         throw err;

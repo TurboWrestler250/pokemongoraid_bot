@@ -6,16 +6,14 @@ export async function formatRaid(ctx, raid) {
   if (!raid.getPokemon()) return "Errore: Pokemon non specificato.";
 
   // const pokemon = await multiPokemon();
-  const pokemon = await dataPokemon(raid.getPokemon().toLowerCase()); // sempre oggetto
-  console.log("pokemon in formatRaid:", typeof(pokemon), pokemon);
+  const pokemon = await dataPokemon(raid.getPokemon().toLowerCase()); // sempre array 
+  console.log("pokemon in formatRaid:", Array.isArray(pokemon), pokemon);
 
-  if (pkm.length > 1) {
-    // posso fare anche pkm.map(p => p) perché ci sono solo name e url nell'oggetto
-    // const pokemon_list = pkm.map(p => ({ name: p.name, url: p.url }));
-    const pokemon_list = pkm.map(([label, data]) => InlineKeyboard.text(label, data));
+  if (pokemon.length > 1) {
+    const pokemon_list = pokemon.map(p => InlineKeyboard.text(p.name, p.url));
     const keyboard = InlineKeyboard.from([buttonRow]);
 
-    await ctx.reply(`Che forma di ${pkm} vuoi selezionare?`), { 
+    await ctx.reply(`Che forma di ${pokemon} vuoi selezionare?`), { 
       reply_markup: keyboard,
       parse_mode: "Markdown",
       disable_web_page_preview: true
