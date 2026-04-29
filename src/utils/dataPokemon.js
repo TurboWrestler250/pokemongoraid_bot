@@ -2,6 +2,9 @@ export async function dataPokemon(pokemon) {
     if (pokemon === "shaymin") pokemon = "shaymin-land";
     if (pokemon === "deoxys") pokemon = "deoxys-normal";
     if (pokemon === "giratina") pokemon = "giratina-altered";
+    if (pokemon === "tornadus") pokemon = "tornadus-incarnate";
+    if (pokemon === "thundurus") pokemon = "thundurus-incarnate";
+    if (pokemon === "landorus") pokemon = "landorus-incarnate";
 
     try {
         const API_POKEMON = "https://pokeapi.co/api/v2/pokemon/";
