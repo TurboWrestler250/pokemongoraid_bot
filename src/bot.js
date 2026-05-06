@@ -18,7 +18,7 @@ import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
 import { listenerCommands } from "./utils/listenerCommands.js";
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+// dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 // Leggi il JSON
 // const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
@@ -27,7 +27,7 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = NODE_ENV === 'production';
 let bot;
 if (isProduction) {
     bot = new Bot(process.env.BOT_TOKEN);
