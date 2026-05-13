@@ -8,3 +8,7 @@ ScrapedDuck/boss-names.json
 ScrapedDuck/changes.log
 .env.development
 .env.production
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

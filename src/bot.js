@@ -27,16 +27,16 @@ dotenv.config();
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-const isProduction = 'production';
+// const isProduction = 'production';
 let bot;
-if (isProduction) {
-    bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);
+// if (isProduction) {
+    bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);    
     await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN_PRODUCTION);
     console.log('Bot avviato in modalità webhook (production)');
-} else {
-    bot = new Bot(process.env.BOT_TOKEN, { polling: true });
-    console.log('Bot avviato in modalità polling (development)');
-}
+// } else {
+//     bot = new Bot(process.env.BOT_TOKEN, { polling: true });
+//     console.log('Bot avviato in modalità polling (development)');
+// }
 
 // const allowedUsers = [471651426];
 // const allowedGroups = [-4915341478];
