@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start-sd": "node ScrapedDuck/ScrapedDuck-mio.js",
-    "start": "dotenv://:key_d09a44949f502b7f61d476d3d8c72c244cf51b6cec9568059e658fa57b261dc5@dotenv.org/vault/.env.vault?environment=production node src/bot.js",
+    "start": "node src/bot.js",
     "dev": "cross-env NODE_ENV=development nodemon src/bot.js"
   },
   "keywords": [
