@@ -18,7 +18,7 @@ import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
 import { listenerCommands } from "./utils/listenerCommands.js";
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+dotenv.config();
 
 // Leggi il JSON
 // const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
@@ -27,11 +27,11 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = 'production';
 let bot;
 if (isProduction) {
-    bot = new Bot(process.env.BOT_TOKEN);
-    await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN);
+    bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);
+    await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN_PRODUCTION);
     console.log('Bot avviato in modalità webhook (production)');
 } else {
     bot = new Bot(process.env.BOT_TOKEN, { polling: true });
