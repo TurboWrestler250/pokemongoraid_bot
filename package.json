@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start-sd": "node ScrapedDuck/ScrapedDuck-mio.js",
-    "start": "cross-env NODE_ENV=production node src/bot.js",
+    "start": "node src/bot.js",
     "dev": "cross-env NODE_ENV=development nodemon src/bot.js"
   },
   "keywords": [
