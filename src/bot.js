@@ -20,7 +20,8 @@ import { listenerCommands } from "./utils/listenerCommands.js";
 
 dotenv.config();
 
-console.log(`var BOT_TOKEN_PRODUCTION = ${process.env.BOT_TOKEN_PRODUCTION}`)
+console.log("CONTROLLO DELLE VARIABILI D'AMBIENTE IN .ENV")
+console.log(`BOT_TOKEN_PRODUCTION = ${process.env.BOT_TOKEN_PRODUCTION}`)
 
 // Leggi il JSON
 // const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
@@ -29,16 +30,9 @@ console.log(`var BOT_TOKEN_PRODUCTION = ${process.env.BOT_TOKEN_PRODUCTION}`)
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-// const isProduction = 'production';
-let bot;
-// if (isProduction) {
-    bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);    
-    await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN_PRODUCTION);
-    console.log('Bot avviato in modalità webhook (production)');
-// } else {
-//     bot = new Bot(process.env.BOT_TOKEN, { polling: true });
-//     console.log('Bot avviato in modalità polling (development)');
-// }
+let bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);    
+await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN_PRODUCTION);
+console.log('Bot avviato in modalità webhook (production)');
 
 // const allowedUsers = [471651426];
 // const allowedGroups = [-4915341478];
