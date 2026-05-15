@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "start-sd": "node ScrapedDuck/ScrapedDuck-mio.js",
-    "start": "node src/bot.js",
-    "dev": "cross-env NODE_ENV=development nodemon src/bot.js"
+    "start": "cross-env NODE_ENV=production node src/bot.js",
+    "dev": "cross-env NODE_ENV=development nodemon src/bot.js",
+    "watch": "cross-env NODE_ENV=development node --watch src/bot.js"
   },
   "keywords": [
     "telegram",
@@ -21,12 +22,12 @@
     "cross-env": "^10.1.0",
     "csv-parse": "^6.1.0",
     "dotenv": "^17.4.2",
-    "grammy": "^1.38.1",
+    "grammy": "^1.38.2",
     "node-fetch": "^3.3.2",
     "scrapedduck": "github:bigfoott/ScrapedDuck"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.10"
   },
   "engines": {
     "node": "^12.20.0 || >=14.13.1"

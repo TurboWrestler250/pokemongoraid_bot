@@ -1,11 +1,9 @@
-// import { InlineKeyboard } from "grammy";
-// import { raids } from "../utils/raids.js";
 import Raid from "../models/raid.js";
 import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-export const raids = [];           // Struttura dei raid memorizzati in memoria
+export const raids = []; // Struttura dei raid memorizzati in memoria
 
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 

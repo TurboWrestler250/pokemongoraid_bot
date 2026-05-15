@@ -30,9 +30,15 @@ console.log(`BOT_TOKEN_PRODUCTION = ${process.env.BOT_TOKEN_PRODUCTION}`)
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-let bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);    
-await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN_PRODUCTION);
-console.log('Bot avviato in modalità webhook (production)');
+let bot;
+if (process.env.NODE_ENV === "production") {
+    bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);
+    await bot.api.setWebhook("https://pokemongoraid-bot.on.shiper.app/" + process.env.BOT_TOKEN);
+    console.log("Bot avviato in modalità webhook (production)");
+} else if (process.env.NODE_ENV === "development") {
+    bot = new Bot(process.env.BOT_TOKEN_DEVELOPMENT, { polling: true });
+    console.log("Bot avviato in modalità polling (development)");
+} else console.log("Errore nell'acquisizione della viariabile NODE_ENV");
 
 // const allowedUsers = [471651426];
 // const allowedGroups = [-4915341478];
