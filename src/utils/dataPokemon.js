@@ -1,4 +1,11 @@
 export async function dataPokemon(pokemon) {
+    if (pokemon === "shaymin") pokemon = "shaymin-land";
+    if (pokemon === "deoxys") pokemon = "deoxys-normal";
+    if (pokemon === "giratina") pokemon = "giratina-altered";
+    if (pokemon === "tornadus") pokemon = "tornadus-incarnate";
+    if (pokemon === "thundurus") pokemon = "thundurus-incarnate";
+    if (pokemon === "landorus") pokemon = "landorus-incarnate";
+
     const API_POKEMON = "https://pokeapi.co/api/v2/pokemon/";
     const flag = true;
     let count;
@@ -52,7 +59,10 @@ export async function dataPokemon(pokemon) {
         //     return pkm.map(p => ({ name: p.name, url: p.url }));
         // }
     } catch (err) {
-        console.error("Errore nella ricerca Pokemon", err);
-        throw err;
+        console.error("Errore durante la chiamata API per numero di pokedex: ", err);
+        return ctx.answerCallbackQuery({ 
+            text: "❌ Pokémon non trovato nel database", 
+            show_alert: true 
+        });
     }
 }

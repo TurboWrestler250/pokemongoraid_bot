@@ -21,8 +21,8 @@
   "dependencies": {
     "cross-env": "^10.1.0",
     "csv-parse": "^6.1.0",
-    "dotenv": "^17.2.1",
-    "grammy": "^1.38.1",
+    "dotenv": "^17.4.2",
+    "grammy": "^1.38.2",
     "node-fetch": "^3.3.2",
     "scrapedduck": "github:bigfoott/ScrapedDuck"
   },

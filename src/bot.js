@@ -1,10 +1,10 @@
 // Importa le librerie necessarie
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 import { Bot } from "grammy";
 // import { Message } from "grammy/types";
-// import bosses from './ScrapedDuck/boss-names.json' assert { type: 'json' };
-// import ScrapedDuck from 'ScrapedDuck';
+// import bosses from "./ScrapedDuck/boss-names.json" assert { type: "json" };
+// import ScrapedDuck from "ScrapedDuck";
 
 export const commands = ["raid", "raids", "info", "tag"];
 
@@ -18,25 +18,27 @@ import { callback } from "./utils/callback.js";
 import { readGoogleSheet } from "./utils/gyms.js";
 import { listenerCommands } from "./utils/listenerCommands.js";
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+dotenv.config();
+
+console.log("CONTROLLO DELLE VARIABILI D'AMBIENTE IN .ENV");
+console.log(`BOT_TOKEN_PRODUCTION = ${process.env.BOT_TOKEN_PRODUCTION}`);
 
 // Leggi il JSON
-// const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
+// const rawData = fs.readFileSync("./ScrapedDuck/boss-names.json", "utf-8");
 // const bosses = JSON.parse(rawData);
 
 // Prima di far partire il bot, carica le palestre
 await readGoogleSheet();
 
-const isProduction = process.env.NODE_ENV === 'production';
 let bot;
-if (isProduction) {
-    bot = new Bot(process.env.BOT_TOKEN);
-    await bot.api.setWebhook('https://pokemongoraid-bot.on.shiper.app/' + process.env.BOT_TOKEN);
-    console.log('Bot avviato in modalità webhook (production)');
-} else {
-    bot = new Bot(process.env.BOT_TOKEN, { polling: true });
-    console.log('Bot avviato in modalità polling (development)');
-}
+if (process.env.NODE_ENV === "production") {
+    bot = new Bot(process.env.BOT_TOKEN_PRODUCTION);
+    await bot.api.setWebhook("https://pokemongoraid-bot.on.shiper.app/" + process.env.BOT_TOKEN);
+    console.log("Bot avviato in modalità webhook (production)");
+} else if (process.env.NODE_ENV === "development") {
+    bot = new Bot(process.env.BOT_TOKEN_DEVELOPMENT, { polling: true });
+    console.log("Bot avviato in modalità polling (development)");
+} else console.log("Errore nell'acquisizione della viariabile NODE_ENV");
 
 // const allowedUsers = [471651426];
 // const allowedGroups = [-4915341478];
