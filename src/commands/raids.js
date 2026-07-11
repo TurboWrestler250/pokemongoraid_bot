@@ -1,4 +1,4 @@
-import { raids } from './raid.js';
+// import { raids } from './raid.js';
 
 export function raidsCommand(bot) {
     bot.command("raids", async (ctx) => {

@@ -20,9 +20,6 @@ import { listenerCommands } from "./utils/listenerCommands.js";
 
 dotenv.config();
 
-console.log("CONTROLLO DELLE VARIABILI D'AMBIENTE IN .ENV")
-console.log(`BOT_TOKEN_PRODUCTION = ${process.env.BOT_TOKEN_PRODUCTION}`)
-
 // Leggi il JSON
 // const rawData = fs.readFileSync('./ScrapedDuck/boss-names.json', 'utf-8');
 // const bosses = JSON.parse(rawData);

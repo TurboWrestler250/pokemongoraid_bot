@@ -1,9 +1,12 @@
+import { InlineKeyboard } from "grammy";
+
 import Raid from "../models/raid.js";
+// import { raids } from "../utils/raids.js";
 import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-export const raids = []; // Struttura dei raid memorizzati in memoria
+// export const raids = []; // Struttura dei raid memorizzati in memoria
 
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 
@@ -63,7 +66,7 @@ export function raidCommand(bot) {
     });
 
     raid.setIdMessagge(sendMessage.message_id);
-    raids.push(raid);
+    // raids.push(raid);
     console.log(`Associato Raid ${raid.getId()} al messaggio ${raid.getIdMessagge()}`);
 
     // console.log(`Raid appena creato:`, typeof(raid), raid.toJSON());
@@ -128,22 +131,23 @@ async function closeRaid(bot, ctx, raid) {
     try {
       // Modifica il messaggio per indicare che il raid è chiuso
       const closedMessage = await formatRaid(raid) + "\n\n🔒 *Raid chiuso*";
-      await bot.api.editMessageText(ctx.chat.id, messageId, closedMessage, {
-        parse_mode: "Markdown",
-        disable_web_page_preview: true
-      });
-      
-      // Rimuovi la tastiera
-      await bot.api.editMessageReplyMarkup(ctx.chat.id, messageId, {
-        reply_markup: { inline_keyboard: [] }
-      });
+      await bot.api.editMessageText(
+        ctx.chat.id,
+        messageId,
+        closedMessage,
+        {
+          parse_mode: "Markdown",
+          disable_web_page_preview: true,
+          reply_markup: new InlineKeyboard() // Rimuovi la tastiera
+        }
+      );
     } catch (err) {
       console.error(`Errore durante la chiusura del raid ${raidId}:`, err);
     }
   }
 
   // Rimuovi dalle Map
-  raids.delete(raidId);
+  // raids.delete(raidId);
   // raidMessageMap.delete(raidId);
   
   console.log(`Raid ${raidId} eliminato dalla memoria`);

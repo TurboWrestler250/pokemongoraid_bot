@@ -1,7 +1,7 @@
 import { formatRaid } from "../utils/formatRaid.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-import { raids } from '../commands/raid.js';
+// import { raids } from '../commands/raid.js';
 
 const refreshCooldown = new Map(); // userId -> timestamp ultimo uso
 
