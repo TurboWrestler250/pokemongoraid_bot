@@ -6,7 +6,7 @@ import { formatRaid } from "../utils/formatRaid.js";
 import { findGymByKeywords } from "../utils/gyms.js";
 import { raidKeyboard } from "../utils/keyboards.js";
 
-// export const raids = []; // Struttura dei raid memorizzati in memoria
+export const raids = []; // Struttura dei raid memorizzati in memoria
 
 // import { fetchBosses } from '../ScrapedDuck/ScrapedDuck-mio.js';
 
@@ -66,7 +66,7 @@ export function raidCommand(bot) {
     });
 
     raid.setIdMessagge(sendMessage.message_id);
-    // raids.push(raid);
+    raids.push(raid);
     console.log(`Associato Raid ${raid.getId()} al messaggio ${raid.getIdMessagge()}`);
 
     // console.log(`Raid appena creato:`, typeof(raid), raid.toJSON());
@@ -147,7 +147,7 @@ async function closeRaid(bot, ctx, raid) {
   }
 
   // Rimuovi dalle Map
-  // raids.delete(raidId);
+  raids.delete(raidId);
   // raidMessageMap.delete(raidId);
   
   console.log(`Raid ${raidId} eliminato dalla memoria`);
