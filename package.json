@@ -22,7 +22,7 @@
     "cross-env": "*",
     "csv-parse": "*",
     "dotenv": "*",
-    "grammy": "*",
+    "grammy": "^1.45.1",
     "node-fetch": "*",
     "scrapedduck": "github:bigfoott/ScrapedDuck"
   },

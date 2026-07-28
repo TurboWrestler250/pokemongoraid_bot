@@ -147,7 +147,7 @@ async function closeRaid(bot, ctx, raid) {
   }
 
   // Rimuovi dalle Map
-  raids.delete(raidId);
+  // raids.delete(raidId);
   // raidMessageMap.delete(raidId);
   
   console.log(`Raid ${raidId} eliminato dalla memoria`);
