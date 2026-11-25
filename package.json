@@ -26,6 +26,10 @@
     "node-fetch": "*",
     "scrapedduck": "github:bigfoott/ScrapedDuck"
   },
+  "__commento__": "serve per risolvere il problema di vulnerabilità di minimatch, che è una dipendenza di nodemon",
+  "overrides": {
+    "minimatch": "^11.0.1"
+  },
   "devDependencies": {
     "nodemon": "*"
   },
